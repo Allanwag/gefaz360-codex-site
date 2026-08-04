@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Protótipo navegável do Gefaz360 para gestão completa da fazenda.">
+  <meta name=color-scheme content=dark>
+  <title>Gefaz360</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 36 36" role="img"><path d="M9 25.5c8.6-.7 14.6-5.8 18-15.5 1 9.2-2.2 16.6-10.2 18.3-3.6.8-6.3-.1-7.8-2.8Z"/><path class="brand-mark-line" d="M11.4 24.6c4.8-1.6 8.8-4.8 12-9.7"/></svg>
+        </div>
+        <div><strong>Gefaz360</strong><span>GESTÃO COMPLETA DA FAZENDA</span></div>
+      </div>
+
+      <nav class="nav" aria-label="Navegação principal">
+        <div class="nav-section">
+          <span class="nav-label">Visão geral</span>
+          <button class="nav-item active" data-view="dashboard" data-title="Visão geral"><i data-icon="grid"></i><span>Visão geral</span></button>
+        </div>
+        <div class="nav-section">
+          <span class="nav-label">Safra &amp; campo</span>
+          <button class="nav-item" data-view="spray" data-title="Pulverização · PVGest"><i data-icon="droplet"></i><span>Pulverização</span><b class="nav-count">PV</b></button>
+          <button class="nav-item" data-view="coffee" data-title="Colheita de café"><i data-icon="coffee"></i><span>Café</span><b class="nav-count">68%</b></button>
+          <button class="nav-item" data-view="grains" data-title="Cereais"><i data-icon="sprout"></i><span>Cereais</span></button>
+          <button class="nav-item" data-view="loads" data-title="Cargas &amp; documentos"><i data-icon="truck"></i><span>Cargas &amp; NFs</span><b class="nav-alert">3</b></button>
+        </div>
+        <div class="nav-section">
+          <span class="nav-label">Administração</span>
+          <button class="nav-item" data-view="finance" data-title="Financeiro"><i data-icon="wallet"></i><span>Financeiro</span></button>
+          <button class="nav-item" data-view="people" data-title="Pessoas &amp; RH"><i data-icon="users"></i><span>Pessoas &amp; RH</span></button>
+        </div>
+        <div class="nav-section">
+          <span class="nav-label">Ativos</span>
+          <button class="nav-item" data-view="workshop" data-title="Oficina &amp; manutenção"><i data-icon="wrench"></i><span>Oficina</span><b class="nav-alert amber">4</b></button>
+          <button class="nav-item" data-view="fuel" data-title="Gestão de combustíveis"><i data-icon="fuel"></i><span>Combustíveis</span></button>
+          <button class="nav-item" data-view="inventory" data-title="Estoque &amp; suprimentos"><i data-icon="package"></i><span>Estoque</span></button>
+        </div>
+        <div class="nav-section">
+          <span class="nav-label">Sistema</span>
+          <button class="nav-item" data-view="pvgest" data-title="Central PVGest"><i data-icon="sync"></i><span>Central PVGest</span><em class="live-dot" title="Conectado"></em></button>
+          <button class="nav-item" data-view="roadmap" data-title="Melhorias &amp; benchmarks"><i data-icon="sparkles"></i><span>Melhorias</span></button>
+        </div>
+      </nav>
+
+      <div class="sync-card">
+        <div class="sync-card-top"><i data-icon="cloud"></i><span>PVGest conectado</span><em></em></div>
+        <div class="sync-progress"><span></span></div>
+        <div class="sync-card-foot"><span>Atualizado agora</span><b>98%</b></div>
+      </div>
+
+      <button class="profile-card" id="profileButton">
+        <span class="avatar">MA</span>
+        <span><strong>Mariana Alves</strong><small>Administradora</small></span>
+        <i data-icon="chevrons"></i>
+      </button>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" id="menuButton" aria-label="Abrir menu"><i data-icon="menu"></i></button>
+          <div class="breadcrumb"><span>Fazenda Boa Vista</span><i data-icon="chevron"></i><strong id="pageTitle">Visão geral</strong></div>
+        </div>
+        <div class="topbar-actions">
+          <label class="season-select"><i data-icon="calendar"></i><select id="seasonSelect" aria-label="Selecionar safra"><option>Safra 2025/26</option><option>Safra 2024/25</option><option>Safra 2023/24</option></select></label>
+          <button class="icon-button notification-button" aria-label="Notificações"><i data-icon="bell"></i><span>5</span></button>
+          <button class="primary-button global-add" id="globalAdd"><i data-icon="plus"></i><span>Novo registro</span></button>
+        </div>
+      </header>
+
+      <main class="content" id="content" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <div><span class="eyebrow" id="modalEyebrow">NOVO REGISTRO</span><h2 id="modalTitle">Registrar operação</h2></div>
+        <button class="icon-button" id="closeModal" aria-label="Fechar"><i data-icon="close"></i></button>
+      </div>
+      <form id="recordForm">
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-actions"><button type="button" class="secondary-button" id="cancelModal">Cancelar</button><button type="submit" class="primary-button"><i data-icon="check"></i>Salvar registro</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-icon"><i data-icon="check"></i></span><span><strong id="toastTitle">Registro salvo</strong><small id="toastMessage">A operação foi adicionada com sucesso.</small></span></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
