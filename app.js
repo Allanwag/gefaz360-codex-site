@@ -471,7 +471,7 @@ function renderCoffee() {
     ${renderCoffeeSoilSprayPanel()}
     <div style=height:16px></div>
     <div class="two-col">
-      ${panel('Evolução da colheita de café', 'Sacas beneficiadas por semana · realizado versus plano', `${chart}<div class="chart-legend"><span><i style="--legend-color:var(--green)"></i>Realizado</span><span><i class="dashed" style="--legend-color:var(--gold)"></i>Plano</span></div>`, '<select class="mini-select"><option>Todos os talhões</option><option>Lavoura Norte</option><option>Lavoura Sede</option></select>')}
+      ${panel('Evolução da colheita de café', 'Sacas beneficiadas por semana · realizado versus plano', `${chart}<div class="chart-legend"><span><i style="--legend-color:var(--green)"></i>Realizado</span><span><i class="dashed" style="--legend-color:var(--gold)"></i>Plano</span></div>`, '<select class="mini-select" aria-label="Filtrar evolução por talhão"><option>Todos os talhões</option><option>Lavoura Norte</option><option>Lavoura Sede</option></select>')}
       ${panel('Composição por método', 'Participação no volume colhido · 18.640 sc', `<div class="donut-layout"><div class="donut"><div class="donut-center"><strong>18,6 mil</strong><span>sacas totais</span></div></div><div class="legend-list"><div class="legend-row" style="--legend-color:var(--green)"><i></i><span>Manual</span><b>57%</b></div><div class="legend-row" style="--legend-color:var(--gold)"><i></i><span>De árvore</span><b>26%</b></div><div class="legend-row" style="--legend-color:#a68973"><i></i><span>Varrição</span><b>17%</b></div></div></div><div class="summary-list" style="margin-top:16px"><div class="summary-row"><span>Menor custo / saca</span><strong>De árvore · R$ 29,40</strong></div><div class="summary-row"><span>Maior rendimento</span><strong>Manual · 34,2 sc/ha</strong></div></div>`, '<button class="text-button" data-action="method-report">Relatório</button>')}
     </div>
     <div style="height:16px"></div>
@@ -493,7 +493,7 @@ function renderCoffee() {
       <tr><td><div class="cell-main"><span class="cell-icon">${icon('map')}</span><span><strong>C-04 · Lavoura Sede</strong><small>Mundo Novo · 15 anos</small></span></div></td><td>De árvore</td><td>55,8 ha</td><td><strong>1.756 sc</strong></td><td>31,5 sc/ha</td><td><div class="row-progress"><div class="row-progress-line"><span style="width:81%"></span></div><small>81%</small></div></td><td><span class="status">Adiantado</span></td></tr>
       <tr><td><div class="cell-main"><span class="cell-icon">${icon('map')}</span><span><strong>C-12 · Pedra Branca</strong><small>Arara · 6 anos</small></span></div></td><td>Manual</td><td>37,4 ha</td><td><strong>1.089 sc</strong></td><td>29,1 sc/ha</td><td><div class="row-progress"><div class="row-progress-line"><span style="width:59%"></span></div><small>59%</small></div></td><td><span class="status warning">Atenção</span></td></tr>
       <tr><td><div class="cell-main"><span class="cell-icon">${icon('map')}</span><span><strong>C-02 · Vargem</strong><small>Catucaí · 9 anos</small></span></div></td><td>Varrição</td><td>29,1 ha</td><td><strong>824 sc</strong></td><td>28,3 sc/ha</td><td><div class="row-progress"><div class="row-progress-line"><span style="width:94%"></span></div><small>94%</small></div></td><td><span class="status info">Finalizando</span></td></tr>
-    </tbody></table></div>`, '<select class="mini-select"><option>Rendimento ↓</option><option>Área ↓</option><option>Progresso ↓</option></select>')}
+    </tbody></table></div>`, '<select class="mini-select" aria-label="Ordenar talhões"><option>Rendimento ↓</option><option>Área ↓</option><option>Progresso ↓</option></select>')}
   </div>`;
 }
 
@@ -517,7 +517,7 @@ function renderSpray() {
     <div style="height:16px"></div>
     ${panel('Parâmetros salvos por equipamento', 'Presets versionados por receita, máquina e responsável técnico', `<div class="table-wrap"><table class="data-table"><thead><tr><th>Equipamento</th><th>Receita / alvo</th><th>Velocidade</th><th>RPM</th><th>Modelo do bico</th><th>Quantidade</th><th>Vazão / ha</th><th>Vazão / bico</th><th>Salvo por</th></tr></thead><tbody><tr><td><strong>Uniport 3030</strong><small>Pulverizador próprio</small></td><td>Fungicida F-12<small>Ferrugem</small></td><td>14,8 km/h</td><td>2.000 rpm</td><td>AI 11002</td><td>36 bicos</td><td>142 L/ha</td><td>0,58 L/min</td><td>Ana Ribeiro<small>Hoje · 14:52</small></td></tr><tr><td><strong>John Deere 4730</strong><small>Pulverizador próprio</small></td><td>Herbicida H-08<small>Folhas largas</small></td><td>16,2 km/h</td><td>2.100 rpm</td><td>TTI 11003</td><td>48 bicos</td><td>120 L/ha</td><td>0,65 L/min</td><td>Lucas Martins<small>Hoje · 12:46</small></td></tr><tr><td><strong>Imperador 3000</strong><small>Pulverizador terceirizado</small></td><td>Nutrição N-04<small>Foliar</small></td><td>13,5 km/h</td><td>1.950 rpm</td><td>AIXR 11002</td><td>40 bicos</td><td>160 L/ha</td><td>0,60 L/min</td><td>Lucas Martins<small>Ontem · 17:20</small></td></tr></tbody></table></div>`, '<button class="primary-button" data-action="spray-params">'+icon('plus')+'Novo preset</button>')}
     <div style="height:16px"></div>
-    ${panel('Agenda de aplicações','Receita, responsável técnico, equipamento e evidência de execução',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Aplicação</th><th>Talhão</th><th>Receita / agrônomo</th><th>Equipamento / tratorista</th><th>Área</th><th>Janela</th><th>Status</th></tr></thead><tbody><tr><td><strong>APL-042</strong><small>16 jul · 15:20</small></td><td>C-07 · Boa Esperança</td><td>Fungicida F-12<small>R.T. Ana Ribeiro</small></td><td>Uniport 3030<small>Carlos Mendes</small></td><td>42,0 ha</td><td>14:00–20:30</td><td><span class="status">Em execução</span></td></tr><tr><td><strong>APL-041</strong><small>16 jul · 13:05</small></td><td>M-03 · Chapadão</td><td>Herbicida H-08<small>R.T. Lucas Martins</small></td><td>JD 4730<small>Paulo Nunes</small></td><td>58,6 ha</td><td>12:30–18:00</td><td><span class="status">Em execução</span></td></tr><tr><td><strong>APL-043</strong><small>17 jul · 05:40</small></td><td>S-08 · Cerrado</td><td>Nutrição N-04<small>R.T. Lucas Martins</small></td><td>Imperador 3000<small>Rafael Souza</small></td><td>64,2 ha</td><td>05:30–09:00</td><td><span class="status info">Liberada</span></td></tr><tr><td><strong>APL-044</strong><small>17 jul · 16:00</small></td><td>C-04 · Lavoura Sede</td><td>Inseticida I-06<small>R.T. Ana Ribeiro</small></td><td>Uniport 3030<small>Marcos Oliveira</small></td><td>55,8 ha</td><td>A confirmar</td><td><span class="status warning">Aguarda clima</span></td></tr></tbody></table></div>`,'<select class="mini-select"><option>Próximas 48 horas</option><option>Esta semana</option><option>Safra</option></select>')}
+    ${panel('Agenda de aplicações','Receita, responsável técnico, equipamento e evidência de execução',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Aplicação</th><th>Talhão</th><th>Receita / agrônomo</th><th>Equipamento / tratorista</th><th>Área</th><th>Janela</th><th>Status</th></tr></thead><tbody><tr><td><strong>APL-042</strong><small>16 jul · 15:20</small></td><td>C-07 · Boa Esperança</td><td>Fungicida F-12<small>R.T. Ana Ribeiro</small></td><td>Uniport 3030<small>Carlos Mendes</small></td><td>42,0 ha</td><td>14:00–20:30</td><td><span class="status">Em execução</span></td></tr><tr><td><strong>APL-041</strong><small>16 jul · 13:05</small></td><td>M-03 · Chapadão</td><td>Herbicida H-08<small>R.T. Lucas Martins</small></td><td>JD 4730<small>Paulo Nunes</small></td><td>58,6 ha</td><td>12:30–18:00</td><td><span class="status">Em execução</span></td></tr><tr><td><strong>APL-043</strong><small>17 jul · 05:40</small></td><td>S-08 · Cerrado</td><td>Nutrição N-04<small>R.T. Lucas Martins</small></td><td>Imperador 3000<small>Rafael Souza</small></td><td>64,2 ha</td><td>05:30–09:00</td><td><span class="status info">Liberada</span></td></tr><tr><td><strong>APL-044</strong><small>17 jul · 16:00</small></td><td>C-04 · Lavoura Sede</td><td>Inseticida I-06<small>R.T. Ana Ribeiro</small></td><td>Uniport 3030<small>Marcos Oliveira</small></td><td>55,8 ha</td><td>A confirmar</td><td><span class="status warning">Aguarda clima</span></td></tr></tbody></table></div>`,'<select class="mini-select" aria-label="Filtrar agenda por período"><option>Próximas 48 horas</option><option>Esta semana</option><option>Safra</option></select>')}
   </div>`;
 }
 
@@ -674,7 +674,7 @@ function renderLoadsLegacy() {
       ${metricCard({label:'NF-e pendente',value:'3',unit:'cargas',iconName:'receipt',delta:'R$ 214 mil',foot:'sem faturamento',tone:'orange',down:true})}
       ${metricCard({label:'Divergência de peso',value:'0,34',unit:'%',iconName:'alert',delta:'-0,18 p.p.',foot:'últimos 30 dias',tone:'gold'})}
     </section>
-    ${panel('Fila de expedição e faturamento','Safra 2025/26 · atualizado após cada pesagem',`<div class="search-row"><label class="search-box">${icon('search')}<input id="loadSearch" placeholder="Buscar carga, placa, NF ou destino"></label><div class="filter-chips"><button class="filter-chip active">Todas</button><button class="filter-chip">No pátio</button><button class="filter-chip">Sem NF</button><button class="filter-chip">A receber</button></div></div><div class="table-wrap"><table class="data-table" id="loadsTable"><thead><tr><th>Carga</th><th>Cultura</th><th>Veículo</th><th>Peso líquido</th><th>Destino</th><th>NF-e</th><th>Valor</th><th>Pagamento</th></tr></thead><tbody>${rows.map(r=>`<tr><td><strong>${r[0]}</strong><small>16/07/2026</small></td><td><span class="status ${r[1]==='Milho'?'warning':''}">${r[1]}</span></td><td>${r[2]}</td><td><strong>${r[3]}</strong></td><td>${r[4]}</td><td><span class="status ${r[5]==='Não emitida'?'danger':''}">${r[5]}</span></td><td>${r[6]}</td><td><span class="status ${r[7]==='Pago'?'':'warning'}">${r[7]}</span></td></tr>`).join('')}</tbody></table></div>`, '<select class="mini-select"><option>16 jul 2026</option><option>Últimos 7 dias</option><option>Safra completa</option></select>')}
+    ${panel('Fila de expedição e faturamento','Safra 2025/26 · atualizado após cada pesagem',`<div class="search-row"><label class="search-box">${icon('search')}<input id="loadSearch" placeholder="Buscar carga, placa, NF ou destino"></label><div class="filter-chips"><button class="filter-chip active">Todas</button><button class="filter-chip">No pátio</button><button class="filter-chip">Sem NF</button><button class="filter-chip">A receber</button></div></div><div class="table-wrap"><table class="data-table" id="loadsTable"><thead><tr><th>Carga</th><th>Cultura</th><th>Veículo</th><th>Peso líquido</th><th>Destino</th><th>NF-e</th><th>Valor</th><th>Pagamento</th></tr></thead><tbody>${rows.map(r=>`<tr><td><strong>${r[0]}</strong><small>16/07/2026</small></td><td><span class="status ${r[1]==='Milho'?'warning':''}">${r[1]}</span></td><td>${r[2]}</td><td><strong>${r[3]}</strong></td><td>${r[4]}</td><td><span class="status ${r[5]==='Não emitida'?'danger':''}">${r[5]}</span></td><td>${r[6]}</td><td><span class="status ${r[7]==='Pago'?'':'warning'}">${r[7]}</span></td></tr>`).join('')}</tbody></table></div>`, '<select class="mini-select" aria-label="Filtrar cargas por período"><option>16 jul 2026</option><option>Últimos 7 dias</option><option>Safra completa</option></select>')}
   </div>`;
 }
 
@@ -685,6 +685,108 @@ function renderLoads() {
   const actions = '<div class=panel-actions><button class=secondary-button data-action=fiscal-xml>'+icon('upload')+'Importar XML</button><button class=secondary-button data-action=fiscal-document>Emitir NF-e / MDF-e</button><button class=primary-button data-action=sales-contract>'+icon('plus')+'Novo contrato</button></div>';
   const target = content.querySelector('.page-enter');
   target.insertAdjacentHTML('beforeend','<div style=height:16px></div>'+panel('Fluxo fiscal operacional','Do XML e da carga aos documentos, obrigações e lançamentos financeiros',workflow,actions)+'<div style=height:16px></div>'+panel('Contratos e posição comercial','Disponível, fixo e a fixar com adiantamentos, retenções, frete, descontos e margem',contracts,'<button class=secondary-button data-action=bank-reconciliation>'+icon('sync')+'Conciliar banco</button>'));
+}
+
+// Orçamento de safra: valores em reais, para que percentual, saldo e totais sejam
+// derivados do dado e não fiquem dessincronizados de rótulos escritos à mão.
+// Cada linha carrega a safra; safras encerradas não têm valor comprometido.
+const seasonBudget = [
+  { season:'2025/26', category:'Insumos', detail:'Fertilizantes, defensivos e sementes', planned:3420000, actual:3084000, committed:186000 },
+  { season:'2025/26', category:'Mão de obra e encargos', detail:'Fixos, safristas e provisões', planned:2180000, actual:1642000, committed:74000 },
+  { season:'2025/26', category:'Combustíveis e lubrificantes', detail:'Frota, implementos e geradores', planned:1260000, actual:1188000, committed:42000 },
+  { season:'2025/26', category:'Manutenção e peças', detail:'Oficina, corretiva e preventiva', planned:780000, actual:842000, committed:28000 },
+  { season:'2025/26', category:'Serviços e terceiros', detail:'Colheita terceirizada e consultoria', planned:640000, actual:418000, committed:96000 },
+  { season:'2025/26', category:'Comercialização e frete', detail:'Classificação, armazenagem e frete', planned:1040000, actual:712000, committed:154000 },
+  { season:'2024/25', category:'Insumos', detail:'Fertilizantes, defensivos e sementes', planned:3080000, actual:3196000, committed:0 },
+  { season:'2024/25', category:'Mão de obra e encargos', detail:'Fixos, safristas e provisões', planned:1940000, actual:1712000, committed:0 },
+  { season:'2024/25', category:'Combustíveis e lubrificantes', detail:'Frota, implementos e geradores', planned:1120000, actual:1098000, committed:0 },
+  { season:'2024/25', category:'Manutenção e peças', detail:'Oficina, corretiva e preventiva', planned:700000, actual:612000, committed:0 },
+  { season:'2024/25', category:'Serviços e terceiros', detail:'Colheita terceirizada e consultoria', planned:580000, actual:496000, committed:0 },
+  { season:'2024/25', category:'Comercialização e frete', detail:'Classificação, armazenagem e frete', planned:920000, actual:838000, committed:0 },
+  { season:'2023/24', category:'Insumos', detail:'Fertilizantes, defensivos e sementes', planned:2760000, actual:2418000, committed:0 },
+  { season:'2023/24', category:'Mão de obra e encargos', detail:'Fixos, safristas e provisões', planned:1760000, actual:1806000, committed:0 },
+  { season:'2023/24', category:'Combustíveis e lubrificantes', detail:'Frota, implementos e geradores', planned:980000, actual:902000, committed:0 },
+  { season:'2023/24', category:'Manutenção e peças', detail:'Oficina, corretiva e preventiva', planned:620000, actual:548000, committed:0 },
+  { season:'2023/24', category:'Serviços e terceiros', detail:'Colheita terceirizada e consultoria', planned:510000, actual:372000, committed:0 },
+  { season:'2023/24', category:'Comercialização e frete', detail:'Classificação, armazenagem e frete', planned:840000, actual:796000, committed:0 }
+];
+
+// Identificadores estáveis das categorias na exportação: mantidos explícitos para
+// que renomear o rótulo exibido não troque silenciosamente a coluna do CSV.
+const budgetCategorySlugs = {
+  'Insumos':'insumos',
+  'Mão de obra e encargos':'mao_de_obra',
+  'Combustíveis e lubrificantes':'combustiveis',
+  'Manutenção e peças':'manutencao',
+  'Serviços e terceiros':'servicos',
+  'Comercialização e frete':'comercializacao'
+};
+
+function budgetSeasonRecords() {
+  return seasonBudget.filter(item => item.season === state.season);
+}
+
+function budgetMoney(value) {
+  const amount = Math.abs(value);
+  const sign = value < 0 ? '-' : '';
+  if (!amount) return 'R$ 0';
+  return amount >= 1000000 ? sign+'R$ '+fmtBR(amount / 1000000, 2)+' mi' : sign+'R$ '+fmtBR(amount / 1000, 0)+' mil';
+}
+
+function budgetTotals(records) {
+  return records.reduce((sum, item) => ({
+    planned: sum.planned + item.planned,
+    actual: sum.actual + item.actual,
+    committed: sum.committed + item.committed
+  }), { planned:0, actual:0, committed:0 });
+}
+
+function budgetStatus(usedPct) {
+  if (usedPct > 100) return { label:'Estourado', className:'status danger', color:'var(--red)' };
+  if (usedPct >= 90) return { label:'Atenção', className:'status warning', color:'var(--gold)' };
+  return { label:'Dentro do orçamento', className:'status', color:'var(--green)' };
+}
+
+function budgetRows(records) {
+  if (!records.length) return '<tr><td colspan="7"><div class="empty-state"><strong>Nenhum orçamento aprovado para a safra '+state.season+'</strong><p>Selecione outra safra no topo ou registre a primeira linha de orçamento desta safra.</p></div></td></tr>';
+  return records.map(item => {
+    const used = item.planned ? item.actual * 100 / item.planned : 0;
+    const balance = item.planned - item.actual - item.committed;
+    const status = budgetStatus(used);
+    const balanceCell = budgetMoney(balance);
+    return '<tr><td><strong>'+item.category+'</strong><small>'+item.detail+'</small></td>'
+      +'<td>'+budgetMoney(item.planned)+'</td>'
+      +'<td><strong>'+budgetMoney(item.actual)+'</strong></td>'
+      +'<td>'+budgetMoney(item.committed)+'</td>'
+      +'<td><strong'+(balance < 0 ? ' style="color:var(--red)"' : '')+'>'+balanceCell+'</strong></td>'
+      +'<td><div class="row-progress"><div class="row-progress-line"><span style="width:'+Math.min(used,100).toFixed(0)+'%;background:'+status.color+'"></span></div><small>'+fmtBR(used,1)+'%</small></div></td>'
+      +'<td><span class="'+status.className+'">'+status.label+'</span></td></tr>';
+  }).join('');
+}
+
+function budgetPanel() {
+  const records = budgetSeasonRecords();
+  const totals = budgetTotals(records);
+  const usedPct = totals.planned ? totals.actual * 100 / totals.planned : 0;
+  const balance = totals.planned - totals.actual - totals.committed;
+  const overspent = records.filter(item => item.actual > item.planned).length;
+  const closed = records.length && !totals.committed;
+  const table = '<div class="table-wrap"><table class="data-table"><thead><tr><th>Categoria de custo</th><th>Orçado</th><th>Realizado</th><th>Comprometido</th><th>Saldo</th><th>Consumo</th><th>Situação</th></tr></thead><tbody>'+budgetRows(records)+'</tbody></table></div>';
+  // Sem linhas na safra não há total a somar: o estado vazio já diz o necessário.
+  const summary = records.length ? '<div style="height:14px"></div><div class="summary-list">'
+    +'<div class="summary-row"><span>Orçamento aprovado da safra</span><strong>'+budgetMoney(totals.planned)+'</strong></div>'
+    +'<div class="summary-row"><span>'+(closed ? 'Realizado na safra' : 'Realizado até agora')+'</span><strong>'+budgetMoney(totals.actual)+' <small>'+fmtBR(usedPct,1)+'% do orçado</small></strong></div>'
+    +'<div class="summary-row"><span>Comprometido a pagar</span><strong>'+budgetMoney(totals.committed)+'</strong></div>'
+    +'<div class="summary-total"><span>'+(closed ? 'Saldo final do orçamento' : 'Saldo livre do orçamento')+'</span><strong'+(balance < 0 ? ' style="color:var(--red)"' : '')+'>'+budgetMoney(balance)+'</strong></div></div>' : '';
+  const actions = '<div class="panel-actions">'
+    +'<select class="mini-select" aria-label="Filtrar orçamento por cultura"><option>Todas as culturas</option><option>Café</option><option>Soja</option><option>Milho</option></select>'
+    +'<button class="secondary-button" data-action="budget-entry">'+icon('plus')+'Registrar orçamento</button></div>';
+  const subtitle = !records.length
+    ? 'Safra '+state.season+' sem orçamento aprovado'
+    : overspent
+      ? 'Safra '+state.season+' · '+overspent+' categoria'+(overspent === 1 ? '' : 's')+' acima do aprovado'
+      : 'Safra '+state.season+' · orçado, realizado e comprometido por categoria';
+  return panel('Orçamento de safra', subtitle, table+summary, actions);
 }
 
 function renderFinance() {
@@ -698,9 +800,11 @@ function renderFinance() {
       ${metricCard({label:'Margem operacional',value:'24,8',unit:'%',iconName:'trending',delta:'+2,1 p.p.',foot:'versus orçamento',tone:'gold'})}
     </section>
     <div class="two-col">
-      ${panel('Fluxo de caixa projetado','Saldo final mensal · R$ milhões · próximos 12 meses',`${cash}<div class="chart-legend"><span><i style="--legend-color:var(--green)"></i>Projeção atual</span><span><i class="dashed" style="--legend-color:var(--gold)"></i>Orçamento</span></div>`,'<select class="mini-select"><option>Cenário base</option><option>Conservador</option><option>Otimista</option></select>')}
+      ${panel('Fluxo de caixa projetado','Saldo final mensal · R$ milhões · próximos 12 meses',`${cash}<div class="chart-legend"><span><i style="--legend-color:var(--green)"></i>Projeção atual</span><span><i class="dashed" style="--legend-color:var(--gold)"></i>Orçamento</span></div>`,'<select class="mini-select" aria-label="Cenário da projeção"><option>Cenário base</option><option>Conservador</option><option>Otimista</option></select>')}
       ${panel('Resultado por cultura','Receita líquida e margem de contribuição',`<div class="summary-list"><div class="summary-row"><span>Café</span><strong>R$ 4,82 mi <small>31,2%</small></strong></div><div class="summary-row"><span>Soja</span><strong>R$ 5,08 mi <small>26,4%</small></strong></div><div class="summary-row"><span>Milho</span><strong>R$ 1,62 mi <small>17,8%</small></strong></div><div class="summary-row"><span>Serviços / outros</span><strong>R$ 184 mil <small>12,1%</small></strong></div><div class="summary-total"><span>Receita líquida safra</span><strong>R$ 11,70 mi</strong></div></div>`,'<span class="panel-meta">Realizado + contratado</span>')}
     </div>
+    <div style="height:16px"></div>
+    ${budgetPanel()}
     <div style="height:16px"></div>
     ${panel('Próximos compromissos','Títulos ordenados por vencimento e criticidade',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Vencimento</th><th>Descrição</th><th>Centro de custo</th><th>Tipo</th><th>Valor</th><th>Status</th></tr></thead><tbody>
       <tr><td><strong>18 jul</strong><small>em 2 dias</small></td><td>Folha equipe de colheita</td><td>Café · colheita</td><td>Pagamento</td><td><strong>R$ 186.420</strong></td><td><span class="status warning">Programado</span></td></tr>
@@ -722,7 +826,7 @@ function renderPeople() {
       ${metricCard({label:'Produtividade café',value:'7,4',unit:'medidas/dia',iconName:'trending',delta:'+5,9%',foot:'versus 7 dias',tone:'gold'})}
     </section>
     <div class="two-col">
-      ${panel('Produtividade das equipes de café','Índice sobre a meta diária · últimos 7 dias',`<div class="bar-chart">${prod.map((v,i)=>`<div class="bar-group"><span class="bar" style="--h:${v*1.8}px;--bar-color:${v>=85?'var(--green)':v>=75?'var(--gold)':'var(--orange)'}"></span><span class="bar-label">EQ ${String(i+1).padStart(2,'0')}</span></div>`).join('')}</div><div class="chart-legend"><span><i style="--legend-color:var(--green)"></i>Meta atingida</span><span><i style="--legend-color:var(--gold)"></i>75%–84%</span><span><i style="--legend-color:var(--orange)"></i>Abaixo de 75%</span></div>`, '<select class="mini-select"><option>Café · hoje</option><option>Últimos 7 dias</option></select>')}
+      ${panel('Produtividade das equipes de café','Índice sobre a meta diária · últimos 7 dias',`<div class="bar-chart">${prod.map((v,i)=>`<div class="bar-group"><span class="bar" style="--h:${v*1.8}px;--bar-color:${v>=85?'var(--green)':v>=75?'var(--gold)':'var(--orange)'}"></span><span class="bar-label">EQ ${String(i+1).padStart(2,'0')}</span></div>`).join('')}</div><div class="chart-legend"><span><i style="--legend-color:var(--green)"></i>Meta atingida</span><span><i style="--legend-color:var(--gold)"></i>75%–84%</span><span><i style="--legend-color:var(--orange)"></i>Abaixo de 75%</span></div>`, '<select class="mini-select" aria-label="Filtrar produtividade por cultura e período"><option>Café · hoje</option><option>Últimos 7 dias</option></select>')}
       ${panel('Pendências de RH','Ações necessárias antes do fechamento',`<div class="alerts"><div class="alert-item" style="--alert-color:var(--orange);--alert-soft:var(--orange-soft)"><span class="alert-icon">${icon('clock')}</span><span><strong>11 marcações inconsistentes</strong><small>Precisam de justificativa do líder</small></span><i>${icon('chevron')}</i></div><div class="alert-item" style="--alert-color:var(--gold);--alert-soft:var(--gold-soft)"><span class="alert-icon">${icon('document')}</span><span><strong>4 contratos vencem em 15 dias</strong><small>Equipe temporária · café</small></span><i>${icon('chevron')}</i></div><div class="alert-item" style="--alert-color:var(--blue);--alert-soft:var(--blue-soft)"><span class="alert-icon">${icon('shield')}</span><span><strong>6 treinamentos de NR-31</strong><small>Agendar antes de 31 jul</small></span><i>${icon('chevron')}</i></div></div>`,'<span class="status warning">21 itens</span>')}
     </div>
     <div style="height:16px"></div>
@@ -752,7 +856,7 @@ function renderWorkshopLegacy() {
       <div class="kanban-col" style="--kanban-color:var(--orange)"><div class="kanban-head"><strong>Aguardando</strong><span>4</span></div>${workCard('#OS-188','Troca de rolamento do rotor','Colheitadeira Case 8250','Vence hoje','LM','var(--red)')}${workCard('#OS-187','Revisão de 500 horas','Trator JD 7230J','18 jul','FR')}${workCard('#OS-185','Vazamento no comando hidráulico','Pulverizador Uniport 3030','19 jul','PC')}</div>
       <div class="kanban-col" style="--kanban-color:var(--gold)"><div class="kanban-head"><strong>Em execução</strong><span>3</span></div>${workCard('#OS-184','Troca do kit de filtros','Trator MF 6713','Há 2h','AS')}${workCard('#OS-181','Reparo elétrico do painel','Caminhão Ford Cargo 2429','Há 5h','RM')}${workCard('#OS-179','Alinhamento de plataforma','Colheitadeira S770','Ontem','LM')}</div>
       <div class="kanban-col" style="--kanban-color:var(--green)"><div class="kanban-head"><strong>Concluídas</strong><span>5</span></div>${workCard('#OS-178','Substituição correia do alternador','Trator Valtra T230','Hoje · 10:42','AS','var(--green)')}${workCard('#OS-177','Manutenção preventiva 250h','Pá carregadeira WA200','Hoje · 08:16','PC','var(--green)')}${workCard('#OS-176','Reparo no sistema de freio','Caminhão Volvo VM 330','Ontem · 17:30','RM','var(--green)')}</div>
-    </div>`,'<div class="panel-actions"><select class="mini-select"><option>Todas as prioridades</option><option>Críticas</option><option>Preventivas</option></select></div>')}
+    </div>`,'<div class="panel-actions"><select class="mini-select" aria-label="Filtrar ordens por prioridade"><option>Todas as prioridades</option><option>Críticas</option><option>Preventivas</option></select></div>')}
     <div style="height:16px"></div>
     <div class="two-col">
       ${panel('Próximas preventivas','Programação por horímetro e calendário',`<div class="vehicle-list"><div class="vehicle"><span class="vehicle-icon">${icon('tractor')}</span><span><strong>Case 8250 · revisão 1.000h</strong><small>992h registradas · janela máxima 10h</small></span><b style="color:var(--red)">8h</b></div><div class="vehicle"><span class="vehicle-icon">${icon('tractor')}</span><span><strong>John Deere 7230J · revisão 500h</strong><small>471h registradas · kit reservado</small></span><b>29h</b></div><div class="vehicle"><span class="vehicle-icon">${icon('truck')}</span><span><strong>Volvo VM 330 · troca de óleo</strong><small>Vence por data · 23 jul 2026</small></span><b>7 dias</b></div><div class="vehicle"><span class="vehicle-icon">${icon('sprout')}</span><span><strong>Uniport 3030 · calibração</strong><small>Vence por data · 29 jul 2026</small></span><b>13 dias</b></div></div>`,'<button class="text-button" data-action="schedule">Ver plano</button>')}
@@ -831,7 +935,7 @@ function renderInventoryLegacy() {
       ${metricCard({label:'Abaixo do mínimo',value:'12',unit:'itens',iconName:'alert',delta:'4 críticos',foot:'para a oficina',tone:'orange',down:true})}
       ${metricCard({label:'Giro de estoque',value:'4,7',unit:'vezes/ano',iconName:'sync',delta:'+0,6',foot:'versus ano anterior',tone:'gold'})}
     </section>
-    ${panel('Posição de estoque','Saldo, ponto de reposição e valor pelo custo médio',`<div class="search-row"><label class="search-box">${icon('search')}<input id="inventorySearch" placeholder="Buscar item ou código"></label><div class="filter-chips" id="inventoryChips">${['Todos','Peças','Consumíveis','Fixadores','Ferramentas','Baixo estoque'].map(x=>`<button class="filter-chip ${state.inventoryFilter===x?'active':''}" data-inventory-filter="${x}">${x}</button>`).join('')}</div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Item</th><th>Categoria</th><th>Saldo</th><th>Mínimo</th><th>Valor</th><th>Situação</th><th></th></tr></thead><tbody id="inventoryBody">${inventoryRows()}</tbody></table></div>`,'<select class="mini-select"><option>Almoxarifado central</option><option>Oficina</option><option>Campo</option></select>')}
+    ${panel('Posição de estoque','Saldo, ponto de reposição e valor pelo custo médio',`<div class="search-row"><label class="search-box">${icon('search')}<input id="inventorySearch" placeholder="Buscar item ou código"></label><div class="filter-chips" id="inventoryChips">${['Todos','Peças','Consumíveis','Fixadores','Ferramentas','Baixo estoque'].map(x=>`<button class="filter-chip ${state.inventoryFilter===x?'active':''}" data-inventory-filter="${x}">${x}</button>`).join('')}</div></div><div class="table-wrap"><table class="data-table"><thead><tr><th>Item</th><th>Categoria</th><th>Saldo</th><th>Mínimo</th><th>Valor</th><th>Situação</th><th></th></tr></thead><tbody id="inventoryBody">${inventoryRows()}</tbody></table></div>`,'<select class="mini-select" aria-label="Filtrar estoque por depósito"><option>Almoxarifado central</option><option>Oficina</option><option>Campo</option></select>')}
   </div>`;
 }
 
@@ -1113,9 +1217,44 @@ function connectedTabs() {
   return '<div class=subnav role=tablist aria-label=Central-conectada>'+tabs.map(item => '<button class='+(state.connectedTab===item[0]?'active':'inactive')+' data-connected-tab='+item[0]+' role=tab>'+item[1]+'</button>').join('')+'</div>';
 }
 
+// Recebimento de mídia pelo WhatsApp. Documento já era aceito; áudio e foto ganham
+// aqui limites e tratamento próprios, porque cada um exige coisas diferentes
+// (duração e transcrição no áudio, resolução e GPS na foto).
+const whatsappMediaConfig = [
+  { type:'Áudio', iconName:'bell', formats:'OGG, MP3, M4A', maxMb:16, perMessage:'até 5 min por mensagem', handling:'Transcrição automática e revisão humana antes de virar registro', enabled:true },
+  { type:'Foto', iconName:'map', formats:'JPG, PNG, HEIC', maxMb:10, perMessage:'até 6 fotos por mensagem', handling:'Compressão para 1600px e leitura de GPS do EXIF', enabled:true },
+  { type:'Documento', iconName:'receipt', formats:'PDF, XML, CSV, XLSX', maxMb:25, perMessage:'até 3 arquivos por mensagem', handling:'Leitura de NF-e e anexo ao registro de origem', enabled:true }
+];
+
+function whatsappMediaRows() {
+  return whatsappMediaConfig.map(item => {
+    const status = item.enabled
+      ? '<span class="status">Recebendo</span>'
+      : '<span class="status muted">Desativado</span>';
+    return '<tr><td><div class="cell-main"><span class="cell-icon">'+icon(item.iconName)+'</span><span><strong>'+item.type+'</strong><small>'+item.formats+'</small></span></div></td>'
+      +'<td><strong>'+item.maxMb+' MB</strong><small>por arquivo</small></td>'
+      +'<td>'+item.perMessage+'</td>'
+      +'<td>'+item.handling+'</td>'
+      +'<td>'+status+'</td></tr>';
+  }).join('');
+}
+
+function whatsappMediaPanel() {
+  const active = whatsappMediaConfig.filter(item => item.enabled).map(item => item.type.toLowerCase());
+  const table = '<div class="table-wrap"><table class="data-table"><thead><tr><th>Tipo de mídia</th><th>Limite</th><th>Por mensagem</th><th>Tratamento</th><th>Situação</th></tr></thead><tbody>'+whatsappMediaRows()+'</tbody></table></div>';
+  const rules = '<div style="height:14px"></div><div class="summary-list">'
+    +'<div class="summary-row"><span>Números e grupos autorizados</span><strong>7 números · 2 grupos</strong></div>'
+    +'<div class="summary-row"><span>Retenção da mídia original</span><strong>24 meses <small>vinculada ao registro</small></strong></div>'
+    +'<div class="summary-row"><span>Confirmação humana</span><strong>Obrigatória <small>em todos os formatos</small></strong></div>'
+    +'<div class="summary-total"><span>Formatos recebendo hoje</span><strong>'+(active.length ? active.join(', ') : 'nenhum')+'</strong></div></div>';
+  const actions = '<button class="secondary-button" data-action="whatsapp-media">'+icon('shield')+'Configurar mídias</button>';
+  return panel('Envio de áudios, fotos e documentos','Limites, tratamento e retenção por tipo de mídia recebida no número da fazenda',table+rules,actions);
+}
+
 function connectedInbox() {
   const messages = '<div class=chat-list><article class=chat-item><span class=chat-avatar>CM</span><div><div class=chat-head><strong>Carlos Mendes · WhatsApp</strong><small>Hoje · 10:42</small></div><p>Áudio · Case 8250 abastecida com 312 litros. Horímetro 1.842,6. Talhão C-07.</p><div class=audio-line><button data-action=play-audio>'+icon('play')+'</button><i><span style=width:64%></span></i><small>0:18</small></div><div class=ai-draft><span>Rascunho extraído</span><b>Abastecimento · Case 8250 · 312 L · 1.842,6 h · C-07</b><small>Confiança 96% · nenhum lançamento realizado</small></div><div class=panel-actions><button class=secondary-button data-action=whatsapp-review>Revisar</button><button class=primary-button data-action=whatsapp-confirm>'+icon('check')+'Confirmar e salvar</button></div></div></article><article class=chat-item><span class=chat-avatar>AP</span><div><div class=chat-head><strong>Ana Pereira · WhatsApp</strong><small>Hoje · 09:15</small></div><p>Foto + texto · Mancha de ferrugem na borda do C-04. Ponto enviado pelo celular.</p><div class=ai-draft><span>Rascunho extraído</span><b>Observação MIP · Ferrugem · C-04 · GPS anexado · 2 fotos</b><small>Confiança 88% · requer severidade</small></div><button class=secondary-button data-action=whatsapp-review>Completar dados</button></div></article></div>';
-  return panel('Entrada assistida pelo WhatsApp','Texto, foto e áudio viram rascunhos estruturados; somente a confirmação humana cria o registro',messages,'<button class=primary-button data-action=whatsapp-entry>'+icon('plus')+'Simular mensagem</button>');
+  return panel('Entrada assistida pelo WhatsApp','Texto, foto e áudio viram rascunhos estruturados; somente a confirmação humana cria o registro',messages,'<button class=primary-button data-action=whatsapp-entry>'+icon('plus')+'Simular mensagem</button>')
+    +'<div style="height:16px"></div>'+whatsappMediaPanel();
 }
 
 function connectedSync() {
@@ -1382,19 +1521,44 @@ registerPrototypeForm('bank_reconciliation','FINANCEIRO','Importar extrato e con
 
 registerPrototypeForm('purchase_request','COMPRAS','Nova solicitação de compra','Solicitação criada','Nova solicitação gerada a partir do estoque','package','<div class=form-grid><div class=form-field><label>Item</label><select name=item><option>FIL-JD500 · Kit filtros JD 500h</option><option>ROL-6208 · Rolamento 6208 2RS</option><option>OLE-15W40 · Óleo motor 15W40</option></select></div><div class=form-field><label>Quantidade</label><input name=quantity type=number step=0.01 value=6 required></div><div class=form-field><label>Necessidade até</label><input name=needed_at type=date value=2026-07-27></div><div class=form-field><label>Centro de custo</label><select name=cost_center><option>Oficina</option><option>Café</option><option>Grãos</option></select></div><div class=form-field full><label>Justificativa</label><textarea name=reason required>Estoque abaixo do mínimo e revisão programada.</textarea></div></div>');
 registerPrototypeForm('purchase_quote','COMPRAS','Registrar três cotações','Cotações comparadas','Cotações vinculadas à solicitação','coins','<div class=form-grid><div class=form-field><label>Solicitação</label><input name=request_id value=SC-048></div><div class=form-field><label>Critério</label><select name=selection_criterion><option>Menor custo total</option><option>Melhor prazo</option><option>Melhor condição técnica</option></select></div><div class=form-field full><label>Fornecedor 1 · valor / prazo</label><input name=quote_1 value=Agro-Peças-Oeste-R$-18.420-2-dias></div><div class=form-field full><label>Fornecedor 2 · valor / prazo</label><input name=quote_2 value=Campo-Forte-R$-17.820-8-dias></div><div class=form-field full><label>Fornecedor 3 · valor / prazo</label><input name=quote_3 value=Minas-Agro-R$-19.460-entrega-hoje></div><div class=form-note>A escolha fora do menor custo exige justificativa e segue para a alçada configurada.</div></div>');
+registerPrototypeForm('whatsapp_media','CAMPO CONECTADO · MÍDIAS DO WHATSAPP','Configurar envio de áudios e fotos','Configuração de mídia salva','Regras de recebimento de mídia do WhatsApp atualizadas','shield','<div class=form-grid><div class=form-field><label>Tipo de mídia</label><select name=media_kind required><option>Áudio</option><option>Foto</option><option>Documento</option></select></div><div class=form-field><label>Recebimento</label><select name=media_enabled><option>Habilitado</option><option>Desabilitado</option></select></div><div class=form-field><label>Formatos aceitos</label><input name=media_formats value=OGG,-MP3,-M4A required></div><div class=form-field><label>Tamanho máximo por arquivo · MB</label><input name=max_file_mb type=number min=1 max=100 value=16 required></div><div class=form-field><label>Arquivos por mensagem</label><input name=max_per_message type=number min=1 max=20 value=5></div><div class=form-field><label>Duração máxima do áudio · min</label><input name=max_audio_min type=number min=1 max=30 value=5></div><div class=form-field><label>Transcrição automática do áudio</label><select name=auto_transcription><option>Ativa · exige revisão humana</option><option>Ativa · sem revisão</option><option>Desativada</option></select></div><div class=form-field><label>Compressão da foto</label><select name=photo_compression><option>1600 px · recomendada</option><option>2400 px</option><option>Original sem compressão</option></select></div><div class=form-field><label>Georreferência na foto</label><select name=photo_geotag><option>Ler GPS do EXIF quando houver</option><option>Exigir GPS · recusar sem coordenada</option><option>Ignorar GPS</option></select></div><div class=form-field><label>Retenção da mídia original · meses</label><input name=media_retention_months type=number min=1 max=120 value=24></div><div class=form-field full><label>Números e grupos autorizados</label><textarea name=allowed_senders>+55-34-99999-0042; +55-34-99999-0187; grupo Colheita Boa Vista</textarea></div><div class=form-note>Áudio e foto seguem a mesma regra do documento: a mídia vira rascunho e só a confirmação humana cria o registro. O arquivo original fica anexado para auditoria durante o prazo de retenção.</div></div>');
+
+registerPrototypeForm('budget','FINANCEIRO · ORÇAMENTO DE SAFRA','Registrar linha de orçamento','Orçamento atualizado','Linha de orçamento de safra registrada','coins','<div class=form-grid><div class=form-field><label>Safra</label><select name=season>'+agronomicSeasonOptions+'</select></div><div class=form-field><label>Categoria de custo</label><select name=budget_category required><option>Insumos</option><option>Mão de obra e encargos</option><option>Combustíveis e lubrificantes</option><option>Manutenção e peças</option><option>Serviços e terceiros</option><option>Comercialização e frete</option></select></div><div class=form-field><label>Cultura</label><select name=crop><option>Todas as culturas</option><option>Café</option><option>Soja</option><option>Milho</option><option>Sorgo</option><option>Trigo</option></select></div><div class=form-field><label>Centro de custo</label><input name=cost_center value=Cafe-colheita></div><div class=form-field><label>Valor orçado · R$</label><input name=planned_amount type=number min=0 step=0.01 value=3420000 required></div><div class=form-field><label>Vigência</label><input name=period type=month value=2026-07></div><div class=form-field full><label>Premissa do orçamento</label><textarea name=assumption placeholder="Base de cálculo, índice de reajuste e responsável pela aprovação"></textarea></div><div class=form-note>O valor aprovado vira a linha de comparação do realizado. Alterações preservam a versão anterior para auditoria.</div></div>');
+
 registerPrototypeForm('purchase_receipt','COMPRAS · RECEBIMENTO','Receber pedido e NF','Recebimento conferido','Pedido recebido e comparado com a nota','download','<div class=form-grid><div class=form-field><label>Pedido de compra</label><select name=purchase_order><option>PC-025</option><option>PC-022</option></select></div><div class=form-field><label>NF-e</label><input name=invoice_number required></div><div class=form-field><label>Quantidade pedida</label><input name=ordered_qty type=number step=0.01 value=12></div><div class=form-field><label>Quantidade recebida</label><input name=received_qty type=number step=0.01 value=13></div><div class=form-field><label>Preço pedido · R$</label><input name=ordered_price type=number step=0.01 value=2880></div><div class=form-field><label>Preço na NF · R$</label><input name=invoiced_price type=number step=0.01 value=3120></div><div class=form-field full><label>Tratamento da divergência</label><select name=variance_action><option>Bloquear e enviar para aprovação</option><option>Receber parcialmente</option><option>Recusar entrega</option></select></div><div class=form-note>Somente após a conferência o recebimento cria entrada de estoque e contas a pagar.</div></div>');
+
+// Aplica as marcações que não pertencem ao HTML dos renderizadores: aviso de
+// protótipo e selo de safra. Precisa rodar depois de qualquer re-render parcial,
+// não apenas na troca de view.
+function decorateView() {
+  clarifyPrototypeStatus();
+  const pageEyebrow = content.querySelector('.page-head .eyebrow');
+  if (pageEyebrow && !content.querySelector('.season-context')) pageEyebrow.insertAdjacentHTML('afterend','<span class=season-context>Safra '+state.season+'</span>');
+  bindViewInteractions();
+}
+
+// Re-render dentro da mesma view (abas, filtros): reaplica decoração e binds,
+// sem mexer em navegação, título ou rolagem.
+function rerenderView(renderer) {
+  renderer();
+  decorateView();
+}
 
 function render() {
   const renderer = renderers[state.view] || renderDashboard;
   renderer();
-  clarifyPrototypeStatus();
-  const pageEyebrow = content.querySelector('.page-head .eyebrow');
-  if (pageEyebrow) pageEyebrow.insertAdjacentHTML('afterend','<span class=season-context>Safra '+state.season+'</span>');
+  decorateView();
   seasonSelect.value = state.season;
   const nav = document.querySelector(`.nav-item[data-view="${state.view}"]`);
-  document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item === nav));
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const isCurrent = item === nav;
+    item.classList.toggle('active', isCurrent);
+    // A seleção era sinalizada só pela classe: sem aria-current o leitor de tela
+    // não distingue o item ativo dos demais.
+    if (isCurrent) item.setAttribute('aria-current','page');
+    else item.removeAttribute('aria-current');
+  });
   pageTitle.textContent = nav?.dataset.title || 'Visão geral';
-  bindViewInteractions();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1407,39 +1571,54 @@ function navigate(view) {
   setTimeout(() => content.focus(), 20);
 }
 
+// bindViewInteractions roda de novo a cada re-render parcial, e nem todo elemento
+// é recriado nesses casos (a busca de estoque, por exemplo, sobrevive). Sem este
+// registro, cada passagem somava mais um listener no mesmo elemento e o total
+// dobrava a cada tecla digitada até travar a aba.
+const boundListeners = new WeakMap();
+function bindOnce(element, type, handler) {
+  if (!element) return;
+  let types = boundListeners.get(element);
+  if (!types) { types = new Set(); boundListeners.set(element, types); }
+  if (types.has(type)) return;
+  types.add(type);
+  element.addEventListener(type, handler);
+}
+
 function bindViewInteractions() {
-  content.querySelectorAll('[data-view-link]').forEach(btn => btn.addEventListener('click', () => navigate(btn.dataset.viewLink)));
-  content.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', () => handleAction(btn.dataset.action, btn)));
-  content.querySelectorAll('[data-grain]').forEach(btn => btn.addEventListener('click', () => { state.grainCrop = btn.dataset.grain; render(); }));
-  content.querySelectorAll('[data-coffee-lot-filter]').forEach(btn => btn.addEventListener('click', () => { state.coffeeLotFilter = btn.dataset.coffeeLotFilter; renderCoffee(); bindViewInteractions(); }));
-  content.querySelectorAll('[data-coffee-quality-tab]').forEach(btn => btn.addEventListener('click', () => { state.coffeeQualityTab = btn.dataset.coffeeQualityTab; renderCoffee(); bindViewInteractions(); }));
-  content.querySelectorAll('[data-dryer-lot]').forEach(btn => btn.addEventListener('click', () => { state.coffeeDryerLot = btn.dataset.dryerLot; renderCoffee(); bindViewInteractions(); }));
-  content.querySelectorAll('[data-inventory-filter]').forEach(btn => btn.addEventListener('click', () => { state.inventoryFilter = btn.dataset.inventoryFilter; renderInventory(); bindViewInteractions(); }));
-  content.querySelectorAll('[data-soil-tab]').forEach(btn => btn.addEventListener('click', () => { state.soilTab = btn.dataset.soilTab; renderSoil(); bindViewInteractions(); }));
-  content.querySelectorAll('[data-soil-plot]').forEach(btn => btn.addEventListener('click', () => { state.soilPlot = decodeURIComponent(btn.dataset.soilPlot); renderSoil(); bindViewInteractions(); }));
-  content.querySelectorAll('[data-map-layer]').forEach(btn => btn.addEventListener('click', () => { state.mapLayer = btn.dataset.mapLayer; renderMapMip(); bindViewInteractions(); }));
-  content.querySelectorAll('[data-connected-tab]').forEach(btn => btn.addEventListener('click', () => { state.connectedTab = btn.dataset.connectedTab; renderConnected(); bindViewInteractions(); }));
+  content.querySelectorAll('[data-view-link]').forEach(btn => bindOnce(btn, 'click', () => navigate(btn.dataset.viewLink)));
+  content.querySelectorAll('[data-action]').forEach(btn => bindOnce(btn, 'click', () => handleAction(btn.dataset.action, btn)));
+  content.querySelectorAll('[data-grain]').forEach(btn => bindOnce(btn, 'click', () => { state.grainCrop = btn.dataset.grain; render(); }));
+  content.querySelectorAll('[data-coffee-lot-filter]').forEach(btn => bindOnce(btn, 'click', () => { state.coffeeLotFilter = btn.dataset.coffeeLotFilter; rerenderView(renderCoffee); }));
+  content.querySelectorAll('[data-coffee-quality-tab]').forEach(btn => bindOnce(btn, 'click', () => { state.coffeeQualityTab = btn.dataset.coffeeQualityTab; rerenderView(renderCoffee); }));
+  content.querySelectorAll('[data-dryer-lot]').forEach(btn => bindOnce(btn, 'click', () => { state.coffeeDryerLot = btn.dataset.dryerLot; rerenderView(renderCoffee); }));
+  content.querySelectorAll('[data-inventory-filter]').forEach(btn => bindOnce(btn, 'click', () => { state.inventoryFilter = btn.dataset.inventoryFilter; rerenderView(renderInventory); }));
+  content.querySelectorAll('[data-soil-tab]').forEach(btn => bindOnce(btn, 'click', () => { state.soilTab = btn.dataset.soilTab; rerenderView(renderSoil); }));
+  content.querySelectorAll('[data-soil-plot]').forEach(btn => bindOnce(btn, 'click', () => { state.soilPlot = decodeURIComponent(btn.dataset.soilPlot); rerenderView(renderSoil); }));
+  content.querySelectorAll('[data-map-layer]').forEach(btn => bindOnce(btn, 'click', () => { state.mapLayer = btn.dataset.mapLayer; rerenderView(renderMapMip); }));
+  content.querySelectorAll('[data-connected-tab]').forEach(btn => bindOnce(btn, 'click', () => { state.connectedTab = btn.dataset.connectedTab; rerenderView(renderConnected); }));
   const stockSearch = document.getElementById('inventorySearch');
-  if (stockSearch) stockSearch.addEventListener('input', () => { document.getElementById('inventoryBody').innerHTML = inventoryRows(); bindViewInteractions(); });
+  if (stockSearch) bindOnce(stockSearch, 'input', () => { document.getElementById('inventoryBody').innerHTML = inventoryRows(); bindViewInteractions(); });
   const loadSearch = document.getElementById('loadSearch');
-  if (loadSearch) loadSearch.addEventListener('input', () => filterTable(loadSearch.value, 'loadsTable'));
+  if (loadSearch) bindOnce(loadSearch, 'input', () => filterTable(loadSearch.value, 'loadsTable'));
   const soilSearch = document.getElementById('soilSearch');
   if (soilSearch) {
     soilSearch.value = state.soilQuery;
     soilSearch.placeholder = 'Buscar análise, talhão ou laboratório';
-    soilSearch.addEventListener('input', () => { state.soilQuery = soilSearch.value; document.getElementById('soilTableBody').innerHTML = soilRows(); });
+    bindOnce(soilSearch, 'input', () => { state.soilQuery = soilSearch.value; document.getElementById('soilTableBody').innerHTML = soilRows(); });
   }
   content.querySelectorAll('.chart-point').forEach(point => {
     const wrap = point.closest('.chart-wrap');
+    if (!wrap) return;
     const tooltip = wrap.querySelector('.chart-tooltip');
-    point.addEventListener('pointerenter', e => {
+    bindOnce(point, 'pointerenter', e => {
       const rect = wrap.getBoundingClientRect();
       tooltip.textContent = point.dataset.tip;
       tooltip.style.left = `${e.clientX - rect.left}px`;
       tooltip.style.top = `${e.clientY - rect.top - 8}px`;
       tooltip.classList.add('show');
     });
-    point.addEventListener('pointerleave', () => tooltip.classList.remove('show'));
+    bindOnce(point, 'pointerleave', () => tooltip.classList.remove('show'));
   });
 }
 
@@ -1497,6 +1676,8 @@ function handleAction(action, button) {
     ,'purchase-request': 'purchase_request'
     ,'purchase-quote': 'purchase_quote'
     ,'purchase-receipt': 'purchase_receipt'
+    ,'budget-entry': 'budget'
+    ,'whatsapp-media': 'whatsapp_media'
   };
   if (formActionMap[action]) return openModal(formActionMap[action]);
   if (['open-modal','row-detail','stock-move'].includes(action)) return openModal(action === 'stock-move' ? 'inventory' : undefined);
@@ -1532,14 +1713,39 @@ function handleAction(action, button) {
   showToast(title, message);
 }
 
+// Os formulários declaram <label>Texto</label> e o campo como irmãos, sem for/id:
+// sem essa ligação o leitor de tela anuncia o controle sem nome. Cada .form-field
+// tem exatamente um rótulo e um campo, então a associação é feita aqui — o que
+// também faz o clique no rótulo focar o campo.
+function associateFormLabels(root) {
+  let sequence = 0;
+  root.querySelectorAll('.form-field').forEach(field => {
+    const label = field.querySelector(':scope > label');
+    const control = field.querySelector('input, select, textarea');
+    if (!label || !control) return;
+    if (!control.id) control.id = 'campo-' + (++sequence) + '-' + String(control.name || '').replace(/[^\w-]/g,'');
+    label.htmlFor = control.id;
+  });
+}
+
+// Com o modal aberto o resto da página seguia alcançável por Tab e o fundo rolava.
+// `inert` tira a shell da ordem de foco e da árvore de acessibilidade — como o
+// modal é irmão dela, o Tab passa a circular só dentro do diálogo.
+let modalReturnFocus = null;
+
 function openModal(forcedView) {
   const config = forms[forcedView || state.view] || forms.dashboard;
   document.getElementById('modalEyebrow').textContent = config.eyebrow;
   document.getElementById('modalTitle').textContent = config.title;
-  document.getElementById('modalBody').innerHTML = config.body;
+  const modalBody = document.getElementById('modalBody');
+  modalBody.innerHTML = config.body;
+  associateFormLabels(modalBody);
   modalBackdrop.dataset.formView = forcedView || state.view;
   modalBackdrop.classList.add('open');
   modalBackdrop.setAttribute('aria-hidden','false');
+  modalReturnFocus = document.activeElement;
+  document.querySelector('.app-shell').inert = true;
+  document.body.style.overflow = 'hidden';
   const seasonField = modalBackdrop.querySelector('[name=season]');
   if (seasonField) seasonField.value = state.season;
   const plotField = modalBackdrop.querySelector('[name=plot]');
@@ -1702,6 +1908,11 @@ function openModal(forcedView) {
 function closeModal() {
   modalBackdrop.classList.remove('open');
   modalBackdrop.setAttribute('aria-hidden','true');
+  document.querySelector('.app-shell').inert = false;
+  document.body.style.overflow = '';
+  // Devolve o foco a quem abriu o modal, em vez de descartá-lo no início da página.
+  if (modalReturnFocus && document.contains(modalReturnFocus)) modalReturnFocus.focus();
+  modalReturnFocus = null;
 }
 
 function showToast(title, message) {
@@ -1721,6 +1932,20 @@ function exportCurrentView() {
     trigo: [['colheita','9480','sc'],['cargas','24','carga'],['preco_medio','78.90','BRL/sc'],['contas_a_receber','142000','BRL']],
     coberturas: [['area_implantada','286','ha'],['operacoes','18','talhao'],['custo_medio','412','BRL/ha'],['sementes_a_distribuir','5.8','t']]
   };
+  // O orçamento entra no mesmo formato longo dos demais indicadores, uma linha por
+  // medida, para o CSV do financeiro não virar um schema à parte. Segue a safra
+  // selecionada: safra sem orçamento aprovado simplesmente não gera estas linhas.
+  const budgetRowsCsv = state.view === 'finance'
+    ? budgetSeasonRecords().flatMap(item => {
+      const slug = budgetCategorySlugs[item.category] || 'outros';
+      return [
+        [state.view,state.season,'orcamento_'+slug+'_orcado',item.planned,'BRL'],
+        [state.view,state.season,'orcamento_'+slug+'_realizado',item.actual,'BRL'],
+        [state.view,state.season,'orcamento_'+slug+'_comprometido',item.committed,'BRL'],
+        [state.view,state.season,'orcamento_'+slug+'_saldo',item.planned - item.actual - item.committed,'BRL']
+      ];
+    })
+    : [];
   const rows = state.view === 'grains'
     ? [['modulo','safra','cultura','indicador','valor','unidade'], ...grainExports[state.grainCrop].map(row => ['cereais',state.season,state.grainCrop,...row])]
     : [
@@ -1728,7 +1953,8 @@ function exportCurrentView() {
       [state.view,state.season,'colheita_cafe','18640','sc'],
       [state.view,state.season,'colheita_milho','32880','sc'],
       [state.view,state.season,'colheita_soja','41230','sc'],
-      [state.view,state.season,'saldo_projetado_90d','2410000','BRL']
+      [state.view,state.season,'saldo_projetado_90d','2410000','BRL'],
+      ...budgetRowsCsv
     ];
   const csv = '\ufeff' + rows.map(row => row.join(';')).join('\n');
   const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
