@@ -31,7 +31,7 @@
   --shadow-lg: 0 26px 76px rgba(0, 0, 0, .48);
   --radius: 18px;
   --radius-sm: 12px;
-  font-family: "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Manrope", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
   background: var(--canvas);
   color-scheme: dark;
@@ -152,7 +152,7 @@ svg { display: block; }
 .page-enter { animation: pageIn .28s ease both; }
 @keyframes pageIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 22px; }
-.page-head h1 { margin: 4px 0 6px; font-size: clamp(24px, 3vw, 31px); line-height: 1.15; letter-spacing: -.9px; }
+.page-head h1 { margin: 4px 0 6px; font-size: clamp(24px, 3vw, 31px); font-weight: 800; line-height: 1.15; letter-spacing: -.9px; }
 .page-head p { max-width: 690px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .page-actions { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; }
 .eyebrow { color: var(--green); font-size: 12px; font-weight: 800; letter-spacing: 1.35px; text-transform: uppercase; }
@@ -166,7 +166,7 @@ svg { display: block; }
 .metric-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 12px; font-weight: 700; }
 .metric-icon { width: 30px; height: 30px; padding: 7px; display: grid; place-items: center; border-radius: 9px; color: var(--metric-color, var(--green)); background: var(--metric-soft, var(--green-soft)); }
 .metric-icon svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; }
-.metric-value { position: relative; z-index: 1; margin-top: 13px; font-size: 24px; font-weight: 800; letter-spacing: -.8px; }
+.metric-value { position: relative; z-index: 1; margin-top: 13px; font-size: 24px; font-weight: 800; letter-spacing: -.8px; font-variant-numeric: tabular-nums; }
 .metric-value small { margin-left: 3px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0; }
 .metric-foot { position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; margin-top: 7px; color: var(--muted-2); font-size: 12px; }
 .delta { padding: 3px 5px; border-radius: 5px; color: var(--green-dark); background: var(--green-soft); font-weight: 800; }
@@ -196,7 +196,7 @@ svg { display: block; }
 .harvest-card strong { display: block; font-size: 12px; }
 .harvest-card small { display: block; margin-top: 2px; color: var(--muted-2); font-size: 11px; }
 .harvest-number { margin: 16px 0 9px; display: flex; align-items: flex-end; justify-content: space-between; }
-.harvest-number b { font-size: 19px; letter-spacing: -.5px; }
+.harvest-number b { font-size: 19px; letter-spacing: -.5px; font-variant-numeric: tabular-nums; }
 .harvest-number span { color: var(--muted); font-size: 12px; }
 .progress { height: 6px; overflow: hidden; border-radius: 10px; background: #e9eee8; }
 .progress > span { display: block; height: 100%; border-radius: 10px; background: var(--progress, var(--green)); }
