@@ -124,6 +124,7 @@ const state = {
   connectedTab: 'inbox',
   importedMaps: normalizeImportedMaps(readStoredArray('gefaz360-imported-maps')),
   pendingMapImport: null,
+  mapImportToken: 0,
   soilQuery: '',
   soilTab: 'analyses',
   soilPlot: 'Todos',
@@ -219,9 +220,9 @@ function metricCard({ label, value, unit = '', iconName = 'trending', delta, foo
     blue: ['var(--blue)', 'var(--blue-soft)'], orange: ['var(--orange)', 'var(--orange-soft)'], purple: ['var(--purple)', 'var(--purple-soft)']
   };
   const [color, soft] = tones[tone] || tones.green;
-  return `<article class="metric-card" style="--metric-color:${color};--metric-soft:${soft}">
+  return `<article class="metric-card" data-export-label="${label}" style="--metric-color:${color};--metric-soft:${soft}">
     <div class="metric-top"><span>${label}</span><span class="metric-icon">${icon(iconName)}</span></div>
-    <div class="metric-value">${value}${unit ? `<small>${unit}</small>` : ''}</div>
+    <div class="metric-value" data-export-value="${value}" data-export-unit="${unit}">${value}${unit ? `<small>${unit}</small>` : ''}</div>
     <div class="metric-foot">${delta ? `<span class="delta ${down ? 'down' : neutral ? 'neutral' : ''}">${delta}</span>` : ''}<span>${foot || ''}</span></div>
   </article>`;
 }
@@ -1169,7 +1170,10 @@ function importedMapOverlay() {
   const longitudes = coordinates.map(point => Number(point[0])).filter(Number.isFinite);
   const latitudes = coordinates.map(point => Number(point[1])).filter(Number.isFinite);
   if (!longitudes.length || !latitudes.length) return '';
-  const minLon = Math.min(...longitudes), maxLon = Math.max(...longitudes), minLat = Math.min(...latitudes), maxLat = Math.max(...latitudes);
+  const minLon = longitudes.reduce((min,value) => Math.min(min,value), Infinity);
+  const maxLon = longitudes.reduce((max,value) => Math.max(max,value), -Infinity);
+  const minLat = latitudes.reduce((min,value) => Math.min(min,value), Infinity);
+  const maxLat = latitudes.reduce((max,value) => Math.max(max,value), -Infinity);
   const lonRange = maxLon - minLon || .0001, latRange = maxLat - minLat || .0001;
   const project = point => [50 + (Number(point[0]) - minLon) * 900 / lonRange, 550 - (Number(point[1]) - minLat) * 500 / latRange];
   const colors = ['#166534','#2563eb','#b45309','#7c3aed','#be123c'];
@@ -1735,6 +1739,10 @@ let modalReturnFocus = null;
 
 function openModal(forcedView) {
   const config = forms[forcedView || state.view] || forms.dashboard;
+  if ((forcedView || state.view) === 'map_import') {
+    state.pendingMapImport = null;
+    state.mapImportToken += 1;
+  }
   document.getElementById('modalEyebrow').textContent = config.eyebrow;
   document.getElementById('modalTitle').textContent = config.title;
   const modalBody = document.getElementById('modalBody');
@@ -1769,6 +1777,7 @@ function openModal(forcedView) {
     mapFile.addEventListener('change', () => {
       const file = mapFile.files && mapFile.files[0];
       if (!file) return;
+      const importToken = ++state.mapImportToken;
       state.pendingMapImport = null;
       const extension = file.name.split('.').pop().toLowerCase();
       if (extension !== 'kml') {
@@ -1778,6 +1787,7 @@ function openModal(forcedView) {
       mapImportSummary.value = 'Lendo '+file.name+'…';
       const reader = new FileReader();
       reader.onload = () => {
+        if (importToken !== state.mapImportToken || !modalBackdrop.classList.contains('open')) return;
         try {
           const xml = new DOMParser().parseFromString(String(reader.result || ''),'application/xml');
           if (xml.getElementsByTagName('parsererror').length) throw new Error('KML inválido');
@@ -1815,7 +1825,9 @@ function openModal(forcedView) {
           mapImportSummary.value = file.name+' · falha na leitura: '+error.message+'. Corrija o arquivo antes de importar.';
         }
       };
-      reader.onerror = () => { mapImportSummary.value = file.name+' · não foi possível ler o arquivo local.'; };
+      reader.onerror = () => {
+        if (importToken === state.mapImportToken && modalBackdrop.classList.contains('open')) mapImportSummary.value = file.name+' · não foi possível ler o arquivo local.';
+      };
       reader.readAsText(file);
     });
   }
@@ -1906,6 +1918,10 @@ function openModal(forcedView) {
 }
 
 function closeModal() {
+  if (modalBackdrop.dataset.formView === 'map_import') {
+    state.pendingMapImport = null;
+    state.mapImportToken += 1;
+  }
   modalBackdrop.classList.remove('open');
   modalBackdrop.setAttribute('aria-hidden','true');
   document.querySelector('.app-shell').inert = false;
@@ -1948,14 +1964,10 @@ function exportCurrentView() {
     : [];
   const rows = state.view === 'grains'
     ? [['modulo','safra','cultura','indicador','valor','unidade'], ...grainExports[state.grainCrop].map(row => ['cereais',state.season,state.grainCrop,...row])]
-    : [
-      ['modulo','safra','indicador','valor','unidade'],
-      [state.view,state.season,'colheita_cafe','18640','sc'],
-      [state.view,state.season,'colheita_milho','32880','sc'],
-      [state.view,state.season,'colheita_soja','41230','sc'],
-      [state.view,state.season,'saldo_projetado_90d','2410000','BRL'],
-      ...budgetRowsCsv
-    ];
+    : [['modulo','safra','indicador','valor','unidade'], ...[...content.querySelectorAll('.metric-card')].map(card => {
+      const value = card.querySelector('.metric-value');
+      return [state.view,state.season,card.dataset.exportLabel || card.querySelector('.metric-top span')?.textContent.trim() || 'indicador', value?.dataset.exportValue || value?.textContent.trim() || '', value?.dataset.exportUnit || ''];
+    }), ...budgetRowsCsv];
   const csv = '\ufeff' + rows.map(row => row.join(';')).join('\n');
   const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
