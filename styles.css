@@ -333,7 +333,7 @@ svg { display: block; }
 .filter-chip.active { color: var(--green-dark); border-color: #adc2a6; background: var(--green-soft); }
 
 .integration-hero { position: relative; padding: 23px; overflow: hidden; border-radius: var(--radius); color: #eff6ef; background: var(--sidebar); }
-.integration-hero::after { content: "PV"; position: absolute; right: 25px; top: -18px; color: rgba(255,255,255,.035); font-size: 130px; font-weight: 900; letter-spacing: -12px; }
+.integration-hero::after { content: "PV"; position: absolute; right: 25px; top: -18px; color: rgba(255,255,255,.035); font-size: 130px; font-weight: 800; letter-spacing: -12px; }
 .integration-top { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .integration-brand { display: flex; align-items: center; gap: 13px; }
 .integration-brand .brand-mark { flex: 0 0 42px; }
@@ -438,7 +438,7 @@ svg { display: block; }
 .status-info { color: #27617c; background: var(--blue-soft); }
 .farm-map { position: relative; min-height: 430px; overflow: hidden; border: 1px solid #d5dfd3; border-radius: 16px; background: radial-gradient(circle at 12% 20%,rgba(255,255,255,.55),transparent 22%),linear-gradient(145deg,#d7e3cd,#b7cbaa); }
 .farm-map::before { content: ''; position: absolute; inset: 0; opacity: .26; background-image: linear-gradient(rgba(49,78,52,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(49,78,52,.18) 1px,transparent 1px); background-size: 32px 32px; }
-.map-compass { position: absolute; z-index: 4; top: 18px; right: 18px; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: rgba(30,55,36,.72); font-size: 12px; font-weight: 900; }
+.map-compass { position: absolute; z-index: 4; top: 18px; right: 18px; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: rgba(30,55,36,.72); font-size: 12px; font-weight: 800; }
 .map-plot { position: absolute; z-index: 2; display: grid; place-content: center; gap: 3px; min-width: 92px; min-height: 72px; padding: 10px; border: 2px solid rgba(255,255,255,.9); border-radius: 24% 38% 28% 34%; color: #fff; background: rgba(60,120,67,.76); box-shadow: 0 8px 20px rgba(33,62,37,.16); cursor: pointer; transform: rotate(-2deg); }
 .map-plot strong { font-size: 12px; }
 .map-plot small { font-size: 12px; opacity: .78; }
@@ -452,7 +452,7 @@ svg { display: block; }
 .farm-map[data-layer=yield] .map-plot[data-plot=a] { background: rgba(31,107,62,.86); }
 .farm-map.has-imported-map .map-plot, .farm-map.has-imported-map .map-spot { opacity: .16; }
 .imported-map-layer { position: absolute; z-index: 5; inset: 18px; width: calc(100% - 36px); height: calc(100% - 36px); overflow: visible; pointer-events: none; filter: drop-shadow(0 5px 8px rgba(20,55,30,.2)); }
-.imported-map-layer text { fill: #173b25; paint-order: stroke; stroke: rgba(255,255,255,.9); stroke-width: 8px; stroke-linejoin: round; font-size: 24px; font-weight: 900; text-anchor: middle; }
+.imported-map-layer text { fill: #173b25; paint-order: stroke; stroke: rgba(255,255,255,.9); stroke-width: 8px; stroke-linejoin: round; font-size: 24px; font-weight: 800; text-anchor: middle; }
 .imported-map-badge { position: absolute; z-index: 7; top: 15px; left: 15px; max-width: calc(100% - 80px); padding: 9px 11px; border: 1px solid rgba(255,255,255,.7); border-radius: 10px; background: rgba(255,255,255,.92); box-shadow: 0 5px 16px rgba(30,55,36,.12); }
 .imported-map-badge strong, .imported-map-badge small { display: block; }
 .imported-map-badge strong { color: var(--ink); font-size: 12px; }
@@ -490,7 +490,7 @@ svg { display: block; }
 .mip-grid .row-progress-line { margin-top: 10px; }
 .chat-list { display: grid; gap: 12px; }
 .chat-item { display: grid; grid-template-columns: 38px minmax(0,1fr); gap: 12px; padding: 15px; border: 1px solid var(--line); border-radius: 13px; background: #fbfcfa; }
-.chat-avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: var(--green-dark); background: var(--green-soft); font-size: 12px; font-weight: 900; }
+.chat-avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 12px; color: var(--green-dark); background: var(--green-soft); font-size: 12px; font-weight: 800; }
 .chat-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .chat-head strong { font-size: 12px; }
 .chat-head small { color: var(--muted-2); font-size: 12px; }
@@ -502,7 +502,7 @@ svg { display: block; }
 .audio-line > i span { display: block; height: 100%; border-radius: inherit; background: var(--green); }
 .audio-line small { color: var(--muted); font-size: 12px; }
 .ai-draft { display: grid; gap: 4px; margin: 9px 0; padding: 11px; border-left: 3px solid var(--blue); border-radius: 0 9px 9px 0; background: var(--blue-soft); }
-.ai-draft span { color: #27617c; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.ai-draft span { color: #27617c; font-size: 12px; font-weight: 800; text-transform: uppercase; }
 .ai-draft b { color: var(--ink-2); font-size: 12px; }
 .ai-draft small { color: var(--muted); font-size: 12px; }
 .event-flow, .purchase-flow { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding-bottom: 7px; }
@@ -514,7 +514,7 @@ svg { display: block; }
 .event-flow small, .purchase-flow small { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.4; }
 .event-flow > b, .purchase-flow > b { width: 15px; min-width: 15px; align-self: center; color: var(--muted-2); }
 .purchase-flow article { min-width: 126px; display: grid; align-content: center; gap: 3px; }
-.purchase-flow article > span, .fiscal-flow article > span { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 7px; color: #fff; background: var(--green); font-size: 12px; font-weight: 900; }
+.purchase-flow article > span, .fiscal-flow article > span { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 7px; color: #fff; background: var(--green); font-size: 12px; font-weight: 800; }
 .purchase-flow article > b { color: var(--green); font-size: 12px; }
 .fiscal-flow { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
 .fiscal-flow article { display: grid; gap: 5px; padding: 15px; border: 1px solid var(--line-soft); border-radius: 12px; background: #fbfcfa; }
@@ -523,7 +523,7 @@ svg { display: block; }
 .fiscal-flow b { color: var(--green); font-size: 12px; }
 .lot-genealogy { display: flex; align-items: stretch; gap: 8px; overflow-x: auto; padding: 14px; border: 1px solid var(--line); border-radius: 13px; background: #fbfcfa; }
 .lot-genealogy article { min-width: 160px; padding: 12px; border-radius: 11px; background: #fff; box-shadow: 0 4px 12px rgba(37,53,42,.05); }
-.lot-genealogy article span { color: var(--green); font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.lot-genealogy article span { color: var(--green); font-size: 12px; font-weight: 800; text-transform: uppercase; }
 .lot-genealogy article strong, .lot-genealogy article small { display: block; }
 .lot-genealogy article strong { margin-top: 7px; font-size: 12px; }
 .lot-genealogy article small { margin-top: 3px; color: var(--muted); font-size: 12px; }
@@ -532,7 +532,7 @@ svg { display: block; }
 .lot-genealogy .lot-branch { border-left: 3px solid var(--gold); }
 .benchmark-coverage { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 9px; }
 .benchmark-coverage article { min-width: 0; padding: 13px; border: 1px solid var(--line-soft); border-radius: 11px; background: #fbfcfa; }
-.benchmark-coverage article > span { display: inline-flex; min-height: 20px; padding: 0 7px; align-items: center; border-radius: 99px; color: #fff; background: var(--green); font-size: 12px; font-weight: 900; }
+.benchmark-coverage article > span { display: inline-flex; min-height: 20px; padding: 0 7px; align-items: center; border-radius: 99px; color: #fff; background: var(--green); font-size: 12px; font-weight: 800; }
 .benchmark-coverage strong, .benchmark-coverage small, .benchmark-coverage b { display: block; }
 .benchmark-coverage strong { margin-top: 8px; font-size: 12px; line-height: 1.35; }
 .benchmark-coverage small { min-height: 34px; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.45; }

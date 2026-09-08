@@ -771,7 +771,10 @@ function budgetPanel() {
   const usedPct = totals.planned ? totals.actual * 100 / totals.planned : 0;
   const balance = totals.planned - totals.actual - totals.committed;
   const overspent = records.filter(item => item.actual > item.planned).length;
-  const closed = records.length && !totals.committed;
+  // Safra "fechada" é qualquer safra diferente da vigente (defaultSeason), nunca uma
+  // inferência a partir do comprometido: comprometido zerado também acontece numa safra
+  // ativa (início da safra, ou tudo já convertido em realizado), então não serve de proxy.
+  const closed = records.length > 0 && state.season !== defaultSeason;
   const table = '<div class="table-wrap"><table class="data-table"><thead><tr><th>Categoria de custo</th><th>Orçado</th><th>Realizado</th><th>Comprometido</th><th>Saldo</th><th>Consumo</th><th>Situação</th></tr></thead><tbody>'+budgetRows(records)+'</tbody></table></div>';
   // Sem linhas na safra não há total a somar: o estado vazio já diz o necessário.
   const summary = records.length ? '<div style="height:14px"></div><div class="summary-list">'
