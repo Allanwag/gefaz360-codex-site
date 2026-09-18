@@ -498,6 +498,80 @@ function renderCoffee() {
   </div>`;
 }
 
+// ---- Gefaz Calda (compatibilidade de mistura de calda) -------------------------------------
+// App irmão publicado em https://allanwag.github.io/gefaz-calda/ e carregado por ../gefaz-calda/sdk.js
+// (index.html). A vista de pulverização embute o app num iframe com a receita selecionada e recebe
+// o resultado por postMessage; cada veredito vira uma atividade local (chave pvgest-activities).
+// Receitas demonstrativas no formato mix v1 do SDK: água, equipamento e regras da fazenda ficam
+// na configuração do próprio Gefaz Calda.
+const sprayRecipes = [
+  { id: 'F-12', nome: 'Fungicida F-12 · ferrugem do cafeeiro', cultura: 'Café', alvo: 'Hemileia vastatrix', volumeHa: 400, equipamento: 'turbo',
+    itens: [
+      { nome: 'Azoxistrobina + Ciproconazol', dose: 0.5, unidade: 'L/ha', formulacao: 'SC', classe: 'Fungicida', preco: 185 },
+      { nome: 'Óleo mineral', dose: 1, unidade: 'L/ha', formulacao: 'EC', classe: 'Adjuvante', preco: 14 },
+      { nome: 'Wetcit', dose: 50, unidade: 'mL/100L', classe: 'Adjuvante', preco: 40 }
+    ] },
+  { id: 'SI-02', nome: 'Inseticida SI-02 · bicho-mineiro', cultura: 'Café', alvo: 'Leucoptera coffeella', volumeHa: 400, equipamento: 'turbo',
+    itens: [
+      { nome: 'Clorantraniliprole', dose: 0.1, unidade: 'L/ha', formulacao: 'SC', classe: 'Inseticida', preco: 520 },
+      { nome: 'Abamectina', dose: 0.4, unidade: 'L/ha', formulacao: 'EC', classe: 'Inseticida', preco: 60 },
+      { nome: 'Óleo mineral', dose: 0.5, unidade: 'L/100L', formulacao: 'EC', classe: 'Adjuvante', preco: 14 }
+    ] },
+  { id: 'H-04', nome: 'Herbicida H-04 · entrelinha com manganês (exemplo de incompatibilidade)', cultura: 'Café', alvo: 'Plantas daninhas', volumeHa: 200, equipamento: 'barra',
+    itens: [
+      { nome: 'Glifosato 480 SL', dose: 3, unidade: 'L/ha', formulacao: 'SL', classe: 'Herbicida', preco: 28 },
+      { nome: 'Sulfato de manganês', dose: 1, unidade: 'kg/ha', classe: 'Fertilizante Foliar', preco: 9 }
+    ] }
+];
+let sprayRecipeId = sprayRecipes[0].id;
+let caldaEmbed = null;
+
+function currentSprayRecipe() { return sprayRecipes.find(r => r.id === sprayRecipeId) || sprayRecipes[0]; }
+function sprayMix(recipe) {
+  return { v: 1, origem: 'codex', cultura: recipe.cultura, alvo: recipe.alvo, volumeHa: recipe.volumeHa, equipamento: recipe.equipamento, itens: recipe.itens };
+}
+function caldaUrl(recipe) { return window.GefazCalda ? GefazCalda.urlPara(sprayMix(recipe)) : 'https://allanwag.github.io/gefaz-calda/'; }
+
+function caldaPanel() {
+  const options = sprayRecipes.map(r => `<option value="${r.id}"${r.id === sprayRecipeId ? ' selected' : ''}>${r.nome}</option>`).join('');
+  return panel('Compatibilidade de calda', 'Gefaz Calda embutido: pH alvo, ordem de adição, jar test, custo por hectare e registro Agrofit da receita selecionada',
+    `<div class="calda-toolbar"><label>Receita <select id="calda-receita" class="mini-select" aria-label="Receita para análise de compatibilidade">${options}</select></label><span id="calda-resumo" class="calda-resumo" aria-live="polite"></span></div><div id="calda-slot" class="calda-slot"></div>`,
+    `<a class="text-button" id="calda-abrir" href="${caldaUrl(currentSprayRecipe())}" target="gefaz-calda" rel="noopener">Abrir no Gefaz Calda ${icon('external')}</a>`);
+}
+
+function registrarResultadoCalda(res) {
+  const receita = currentSprayRecipe();
+  const rotulo = (res && res.resumo && res.resumo.rotulo) || (res && res.status) || 'Sem resultado';
+  const resumo = document.getElementById('calda-resumo');
+  if (resumo) {
+    const cls = res.status === 'incompativel' ? 'warning' : res.status === 'compativel' ? '' : 'info';
+    resumo.innerHTML = `<span class="status ${cls}">${plainActivityText(rotulo)}</span><span>confiança ${Math.round((res.confianca || 0) * 100)}%</span>`;
+  }
+  const title = plainActivityText('Gefaz Calda: ' + rotulo + ' · ' + receita.nome);
+  if (state.activities[0] && state.activities[0].title === title) return; // mesma receita reanalisada: não duplica
+  state.activities.unshift({ icon: res.status === 'incompativel' ? 'alert' : 'check', title, meta: plainActivityText('Agora · ' + receita.cultura + ' · ' + receita.alvo) });
+  state.activities = state.activities.slice(0, 5);
+  localStorage.setItem('pvgest-activities', JSON.stringify(state.activities));
+}
+
+function mountCaldaPanel() {
+  const slot = document.getElementById('calda-slot');
+  if (!slot) return;
+  if (caldaEmbed) { caldaEmbed.destruir(); caldaEmbed = null; }
+  if (!window.GefazCalda) {
+    slot.innerHTML = '<p class="calda-offline">O Gefaz Calda não carregou (sem conexão ou fora da mesma origem allanwag.github.io). Use “Abrir no Gefaz Calda”.</p>';
+    return;
+  }
+  caldaEmbed = GefazCalda.embed(slot, sprayMix(currentSprayRecipe()), registrarResultadoCalda);
+  const select = document.getElementById('calda-receita');
+  bindOnce(select, 'change', () => {
+    sprayRecipeId = select.value;
+    const link = document.getElementById('calda-abrir');
+    if (link) link.href = caldaUrl(currentSprayRecipe());
+    if (caldaEmbed) caldaEmbed.enviar(sprayMix(currentSprayRecipe()));
+  });
+}
+
 function renderSpray() {
   content.innerHTML = `<div class="page-enter">
     ${pageHead({eyebrow:'PVGEST · GESTÃO DE PULVERIZAÇÃO',title:'Aplicações seguras, orientadas e rastreáveis.',description:'O núcleo original do PVGest evolui dentro do ERP: o Gestor acompanha custo e conformidade, o Agrônomo prescreve e o Tratorista executa no campo, inclusive offline.',primary:'Nova aplicação',secondary:{label:'Mapa de aplicações',icon:'map',action:'spray-map'}})}
@@ -507,6 +581,8 @@ function renderSpray() {
       ${metricCard({label:'Conformidade climática',value:'94,8',unit:'%',iconName:'shield',delta:'+2,4 p.p.',foot:'janela e deriva',tone:'gold'})}
       ${metricCard({label:'Custo médio aplicado',value:'R$ 126,80',unit:'/ha',iconName:'coins',delta:'-R$ 7,40',foot:'versus orçamento',tone:'orange'})}
     </section>
+    ${caldaPanel()}
+    <div style="height:16px"></div>
     ${renderCoffeeSoilSprayPanel()}
     <div style=height:16px></div>
     ${panel('Um fluxo, três perfis','A separação de responsabilidades do PVGest é preservada e conectada aos demais módulos',`<div class="harvest-cards"><article class="harvest-card"><div class="harvest-card-top"><span class="crop-icon soy">${icon('wallet')}</span><span><strong>Gestor</strong><small>Decisão e governança</small></span></div><div class="summary-list" style="margin-top:11px"><div class="summary-row"><span>Custo por hectare</span><strong>R$ 126,80</strong></div><div class="summary-row"><span>Aplicações conformes</span><strong>94,8%</strong></div></div></article><article class="harvest-card"><div class="harvest-card-top"><span class="crop-icon corn">${icon('sprout')}</span><span><strong>Agrônomo</strong><small>Prescrição e liberação</small></span></div><div class="summary-list" style="margin-top:11px"><div class="summary-row"><span>Receitas liberadas</span><strong>8</strong></div><div class="summary-row"><span>Aguardando janela</span><strong>2</strong></div></div></article><article class="harvest-card"><div class="harvest-card-top"><span class="crop-icon coffee">${icon('tractor')}</span><span><strong>Tratorista</strong><small>Checklist e execução offline</small></span></div><div class="summary-list" style="margin-top:11px"><div class="summary-row"><span>Em execução</span><strong>6</strong></div><div class="summary-row"><span>Checklists completos</span><strong>100%</strong></div></div></article></div>`,'<a class="text-button" href="https://allanwag.github.io/pvgest/" target="_blank" rel="noopener">Abrir PVGest atual '+icon('external')+'</a>')}
@@ -520,6 +596,7 @@ function renderSpray() {
     <div style="height:16px"></div>
     ${panel('Agenda de aplicações','Receita, responsável técnico, equipamento e evidência de execução',`<div class="table-wrap"><table class="data-table"><thead><tr><th>Aplicação</th><th>Talhão</th><th>Receita / agrônomo</th><th>Equipamento / tratorista</th><th>Área</th><th>Janela</th><th>Status</th></tr></thead><tbody><tr><td><strong>APL-042</strong><small>16 jul · 15:20</small></td><td>C-07 · Boa Esperança</td><td>Fungicida F-12<small>R.T. Ana Ribeiro</small></td><td>Uniport 3030<small>Carlos Mendes</small></td><td>42,0 ha</td><td>14:00–20:30</td><td><span class="status">Em execução</span></td></tr><tr><td><strong>APL-041</strong><small>16 jul · 13:05</small></td><td>M-03 · Chapadão</td><td>Herbicida H-08<small>R.T. Lucas Martins</small></td><td>JD 4730<small>Paulo Nunes</small></td><td>58,6 ha</td><td>12:30–18:00</td><td><span class="status">Em execução</span></td></tr><tr><td><strong>APL-043</strong><small>17 jul · 05:40</small></td><td>S-08 · Cerrado</td><td>Nutrição N-04<small>R.T. Lucas Martins</small></td><td>Imperador 3000<small>Rafael Souza</small></td><td>64,2 ha</td><td>05:30–09:00</td><td><span class="status info">Liberada</span></td></tr><tr><td><strong>APL-044</strong><small>17 jul · 16:00</small></td><td>C-04 · Lavoura Sede</td><td>Inseticida I-06<small>R.T. Ana Ribeiro</small></td><td>Uniport 3030<small>Marcos Oliveira</small></td><td>55,8 ha</td><td>A confirmar</td><td><span class="status warning">Aguarda clima</span></td></tr></tbody></table></div>`,'<select class="mini-select" aria-label="Filtrar agenda por período"><option>Próximas 48 horas</option><option>Esta semana</option><option>Safra</option></select>')}
   </div>`;
+  mountCaldaPanel();
 }
 
 const grainCropConfigs = {
@@ -1552,6 +1629,7 @@ function rerenderView(renderer) {
 }
 
 function render() {
+  if (caldaEmbed && state.view !== 'spray') { caldaEmbed.destruir(); caldaEmbed = null; } // iframe do Gefaz Calda não sobrevive à troca de vista
   const renderer = renderers[state.view] || renderDashboard;
   renderer();
   decorateView();
