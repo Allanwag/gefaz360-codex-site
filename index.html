@@ -6,6 +6,13 @@
   <meta name="description" content="Protótipo navegável do Gefaz360 para gestão completa da fazenda.">
   <meta name=color-scheme content=dark>
   <title>Gefaz360</title>
+  <meta name="theme-color" content="#04150d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Gefaz360 Codex">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
@@ -100,5 +107,6 @@
 
   <script src="../gefaz-calda/sdk.js"></script>
   <script src="app.js"></script>
+  <script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 </body>
 </html>

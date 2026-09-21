@@ -1,0 +1,15 @@
+{
+  "name": "Gefaz360 Codex",
+  "short_name": "Gefaz360 Codex",
+  "description": "Painel Gefaz360 (Codex): gestão completa da fazenda com pulverização PVGest integrada.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#04150d",
+  "theme_color": "#04150d",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
