@@ -47,6 +47,7 @@ const icons = {
 };
 
 const storageRecoveryKeys = [];
+let storageUnavailable = false;
 
 function plainActivityText(value) {
   const entities = {'&amp;':'&','&lt;':'<','&gt;':'>'};
@@ -58,8 +59,14 @@ function plainActivityText(value) {
 }
 
 function readStoredArray(key) {
+  let raw;
   try {
-    const raw = localStorage.getItem(key);
+    raw = localStorage.getItem(key);
+  } catch (error) {
+    storageUnavailable = true;
+    return [];
+  }
+  try {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed)) return parsed;
@@ -104,6 +111,17 @@ function normalizeActivities(items) {
   }).slice(0,5);
 }
 
+function saveActivity(activity) {
+  const nextActivities = [activity, ...state.activities].slice(0,5);
+  try {
+    localStorage.setItem('pvgest-activities', JSON.stringify(nextActivities));
+  } catch (error) {
+    return false;
+  }
+  state.activities = nextActivities;
+  return true;
+}
+
 const seasonStartYear = 2018;
 const seasonEndYear = 2049;
 const defaultSeason = '2025/26';
@@ -111,7 +129,12 @@ const seasonOptions = Array.from({ length: seasonEndYear - seasonStartYear + 1 }
   const startYear = seasonEndYear - index;
   return startYear+'/'+String((startYear + 1) % 100).padStart(2,'0');
 });
-const savedSeason = localStorage.getItem('gefaz360-season');
+let savedSeason = null;
+try {
+  savedSeason = localStorage.getItem('gefaz360-season');
+} catch (error) {
+  storageUnavailable = true;
+}
 
 const state = {
   view: 'dashboard',
@@ -549,9 +572,9 @@ function registrarResultadoCalda(res) {
   }
   const title = plainActivityText('Gefaz Calda: ' + rotulo + ' · ' + receita.nome);
   if (state.activities[0] && state.activities[0].title === title) return; // mesma receita reanalisada: não duplica
-  state.activities.unshift({ icon: res.status === 'incompativel' ? 'alert' : 'check', title, meta: plainActivityText('Agora · ' + receita.cultura + ' · ' + receita.alvo) });
-  state.activities = state.activities.slice(0, 5);
-  localStorage.setItem('pvgest-activities', JSON.stringify(state.activities));
+  if (!saveActivity({ icon: res.status === 'incompativel' ? 'alert' : 'check', title, meta: plainActivityText('Agora · ' + receita.cultura + ' · ' + receita.alvo) })) {
+    showToast('Resultado não guardado','A análise foi exibida, mas o armazenamento local está indisponível ou sem espaço.');
+  }
 }
 
 function mountCaldaPanel() {
@@ -2081,7 +2104,12 @@ document.getElementById('profileButton').addEventListener('click', () => showToa
 document.getElementById('seasonSelect').addEventListener('change', e => showToast('Safra alterada',`${e.target.value} aplicada à visão atual.`));
 seasonSelect.addEventListener('change', e => {
   state.season = e.target.value;
-  localStorage.setItem('gefaz360-season', state.season);
+  try {
+    localStorage.setItem('gefaz360-season', state.season);
+  } catch (error) {
+    storageUnavailable = true;
+    showToast('Safra não guardada','A safra mudou nesta sessão, mas o armazenamento deste navegador está indisponível.');
+  }
   render();
 });
 document.getElementById('recordForm').addEventListener('submit', e => {
@@ -2121,24 +2149,32 @@ document.getElementById('recordForm').addEventListener('submit', e => {
       features:pending.features,
       importedAt:new Date().toISOString()
     };
-    if (existingIndex >= 0 && duplicateStrategy.includes('Atualizar')) state.importedMaps.splice(existingIndex,1);
-    state.importedMaps.unshift(importedRecord);
-    state.importedMaps = state.importedMaps.slice(0,20);
-    localStorage.setItem('gefaz360-imported-maps',JSON.stringify(state.importedMaps));
+    const retainedMaps = existingIndex >= 0 && duplicateStrategy.includes('Atualizar')
+      ? state.importedMaps.filter((_, index) => index !== existingIndex)
+      : state.importedMaps;
+    const nextMaps = [importedRecord, ...retainedMaps].slice(0,20);
+    try {
+      localStorage.setItem('gefaz360-imported-maps',JSON.stringify(nextMaps));
+    } catch (error) {
+      showToast('Mapa não salvo','O armazenamento deste navegador está indisponível ou sem espaço. Reduza o KML ou libere espaço e tente novamente.');
+      return;
+    }
+    state.importedMaps = nextMaps;
     state.pendingMapImport = null;
-    state.activities.unshift({icon:'map',title:plainActivityText('Mapa KML importado · '+importedRecord.name),meta:'Agora · '+importedRecord.features.length+' feição'+(importedRecord.features.length===1?'':'ões')});
-    state.activities = state.activities.slice(0,5);
-    localStorage.setItem('pvgest-activities',JSON.stringify(state.activities));
+    const activitySaved = saveActivity({icon:'map',title:plainActivityText('Mapa KML importado · '+importedRecord.name),meta:'Agora · '+importedRecord.features.length+' feição'+(importedRecord.features.length===1?'':'ões')});
     closeModal();
-    showToast('Mapa importado','O arquivo '+importedRecord.fileName+' foi convertido, desenhado e salvo neste navegador.');
+    showToast('Mapa importado',activitySaved
+      ? 'O arquivo '+importedRecord.fileName+' foi convertido, desenhado e salvo neste navegador.'
+      : 'O mapa foi salvo, mas o histórico de atividades não pôde ser atualizado.');
     e.currentTarget.reset();
     if (state.view === 'mapmip') render();
     return;
   }
   const detail = [...formData.values()].find(v => typeof v === 'string' && v.trim()) || config.title;
-  state.activities.unshift({ icon: config.icon, title: plainActivityText(config.activity), meta: plainActivityText(`Agora · ${String(detail).slice(0,42)}`) });
-  state.activities = state.activities.slice(0,5);
-  localStorage.setItem('pvgest-activities', JSON.stringify(state.activities));
+  if (!saveActivity({ icon: config.icon, title: plainActivityText(config.activity), meta: plainActivityText(`Agora · ${String(detail).slice(0,42)}`) })) {
+    showToast('Registro não salvo','O armazenamento deste navegador está indisponível ou sem espaço. Libere espaço e tente novamente.');
+    return;
+  }
   closeModal();
   showToast(config.success,'O registro foi validado no modo demonstrativo e aparece apenas nas atividades locais.');
   if (state.view === 'dashboard') render();
@@ -2160,6 +2196,8 @@ window.addEventListener('hashchange', () => {
   setTimeout(() => content.focus(),20);
 });
 render();
-if (storageRecoveryKeys.length) {
+if (storageUnavailable) {
+  setTimeout(() => showToast('Armazenamento indisponível','A demonstração abriu sem dados locais; alterações não serão guardadas neste navegador.'),0);
+} else if (storageRecoveryKeys.length) {
   setTimeout(() => showToast('Dados locais recuperados','Um armazenamento inválido foi ignorado sem apagar o valor original.'),0);
 }
