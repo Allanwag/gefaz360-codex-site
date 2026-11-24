@@ -160,6 +160,14 @@ const pageTitle = document.getElementById('pageTitle');
 const modalBackdrop = document.getElementById('modalBackdrop');
 const seasonSelect = document.getElementById('seasonSelect');
 
+// Os dados demonstrativos fixos pertencem à safra padrão; só estas vistas filtram por safra de verdade.
+const seasonAwareViews = new Set(['soil']);
+function dataSeason(view) { return seasonAwareViews.has(view) ? state.season : defaultSeason; }
+function seasonContextLabel(view) {
+  const data = dataSeason(view);
+  return state.season !== data ? 'Dados demonstrativos da safra ' + data : 'Safra ' + data;
+}
+
 function clarifyPrototypeStatus() {
   const navStatus = document.querySelector('[data-view=pvgest] .live-dot');
   if (navStatus) navStatus.title = 'Demonstração · não conectado';
@@ -1258,7 +1266,7 @@ function renderMapMipLegacy() {
   const observations = '<div class=table-wrap><table class=data-table><thead><tr><th>Ocorrência / GPS</th><th>Talhão</th><th>Tipo</th><th>Severidade</th><th>Foto</th><th>Responsável</th><th>Destino</th></tr></thead><tbody><tr><td><strong>OBS-145</strong><small>-20.7112, -46.6158</small></td><td>C-07</td><td>Cercosporiose</td><td><span class=status-warning>Alta · 18%</span></td><td>3 fotos</td><td>Ana Ribeiro</td><td><span class=status>Prescrição</span></td></tr><tr><td><strong>OBS-144</strong><small>-20.7141, -46.6202</small></td><td>M-03</td><td>Falha de stand</td><td><span class=status-info>Média · 7%</span></td><td>1 foto</td><td>Lucas Martins</td><td><span class=status-info>Monitorar</span></td></tr><tr><td><strong>OBS-141</strong><small>-20.7189, -46.6114</small></td><td>C-04</td><td>Erosão em sulco</td><td><span class=status-warning>Alta</span></td><td>4 fotos</td><td>Marcos Oliveira</td><td><span class=status-warning>OS aberta</span></td></tr></tbody></table></div>';
   const mip = '<div class=mip-grid><article><span>Bicho-mineiro</span><strong>12,4%</strong><small>Acima do nível de ação em 3 zonas</small><div class=row-progress-line><span style=width:72%></span></div></article><article><span>Cercosporiose</span><strong>8,7%</strong><small>C-07 · bordadura leste</small><div class=row-progress-line><span style=width:58%></span></div></article><article><span>Ferrugem</span><strong>3,1%</strong><small>Abaixo do nível de ação</small><div class=row-progress-line><span style=width:24%></span></div></article><article><span>Broca</span><strong>2,8%</strong><small>Armadilhas atualizadas hoje</small><div class=row-progress-line><span style=width:20%></span></div></article></div>';
   const prescription = '<div class=summary-list><div class=summary-row><span>Talhão / zona</span><strong>C-07 · Z03 · 7,6 ha</strong></div><div class=summary-row><span>Base da decisão</span><strong>MIP + NDVI + solo</strong></div><div class=summary-row><span>Alvo / limiar</span><strong>Cercosporiose · 8%</strong></div><div class=summary-row><span>Taxa variável</span><strong>180–240 L/ha</strong></div><div class=summary-row><span>Economia projetada</span><strong>14,8% de calda</strong></div><div class=summary-total><span>Destino</span><strong>PVGest · PR-048</strong></div></div><div class=form-note>'+icon('link')+'A prescrição localizada mantém a geometria da zona, o motivo agronômico, a dose e os parâmetros de aplicação até a execução.</div>';
-  content.innerHTML = '<div class=page-enter>'+pageHead({eyebrow:'AGRONOMIA GEOREFERENCIADA',title:'Mapa & MIP · '+state.season+'.',description:'Cruze vigor, pragas, fertilidade, produtividade e observações com GPS para decidir por zona e enviar prescrições ao PVGest.',primary:'Nova observação',action:'field-observation',secondary:{label:'Nova avaliação MIP',icon:'clipboard',action:'mip-scout'}})+'<section class=metric-grid>'+metricCard({label:'Área mapeada',value:'258,5',unit:'ha',iconName:'map',delta:'100% dos talhões',foot:'limites conferidos'})+metricCard({label:'Zonas em atenção',value:'5',unit:'zonas',iconName:'alert',delta:'2 críticas',foot:'MIP e anomalias',tone:'orange'})+metricCard({label:'Pontos vistoriados',value:'148',unit:'pontos',iconName:'clipboard',delta:'+32 na semana',foot:'com GPS e fotos',tone:'blue'})+metricCard({label:'Economia estimada',value:'14,8',unit:'%',iconName:'trending',delta:'R$ 18,4 mil',foot:'taxa localizada',tone:'gold'})+'</section><div style=height:16px></div>'+panel(layerNames[state.mapLayer], 'Camada selecionada sobre os limites validados dos talhões', map, mapLayerTabs())+'<div style=height:16px></div><div class=two-col>'+panel('Monitoramento integrado de pragas','Percentual amostrado versus nível de ação',mip,'<button class=secondary-button data-action=mip-scout>'+icon('plus')+'Nova vistoria</button>')+panel('Prescrição localizada sugerida','Decisão assistida, sempre sujeita à aprovação do agrônomo',prescription,'<button class=primary-button data-action=localized-prescription>'+icon('arrow')+'Enviar ao PVGest</button>')+'</div><div style=height:16px></div>'+panel('Observações georreferenciadas','Pragas, falhas, erosão e encharcamento com evidência de campo',observations,'<button class=primary-button data-action=field-observation>'+icon('plus')+'Registrar ponto</button>')+'</div>';
+  content.innerHTML = '<div class=page-enter>'+pageHead({eyebrow:'AGRONOMIA GEOREFERENCIADA',title:'Mapa & MIP · '+dataSeason('mapmip')+'.',description:'Cruze vigor, pragas, fertilidade, produtividade e observações com GPS para decidir por zona e enviar prescrições ao PVGest.',primary:'Nova observação',action:'field-observation',secondary:{label:'Nova avaliação MIP',icon:'clipboard',action:'mip-scout'}})+'<section class=metric-grid>'+metricCard({label:'Área mapeada',value:'258,5',unit:'ha',iconName:'map',delta:'100% dos talhões',foot:'limites conferidos'})+metricCard({label:'Zonas em atenção',value:'5',unit:'zonas',iconName:'alert',delta:'2 críticas',foot:'MIP e anomalias',tone:'orange'})+metricCard({label:'Pontos vistoriados',value:'148',unit:'pontos',iconName:'clipboard',delta:'+32 na semana',foot:'com GPS e fotos',tone:'blue'})+metricCard({label:'Economia estimada',value:'14,8',unit:'%',iconName:'trending',delta:'R$ 18,4 mil',foot:'taxa localizada',tone:'gold'})+'</section><div style=height:16px></div>'+panel(layerNames[state.mapLayer], 'Camada selecionada sobre os limites validados dos talhões', map, mapLayerTabs())+'<div style=height:16px></div><div class=two-col>'+panel('Monitoramento integrado de pragas','Percentual amostrado versus nível de ação',mip,'<button class=secondary-button data-action=mip-scout>'+icon('plus')+'Nova vistoria</button>')+panel('Prescrição localizada sugerida','Decisão assistida, sempre sujeita à aprovação do agrônomo',prescription,'<button class=primary-button data-action=localized-prescription>'+icon('arrow')+'Enviar ao PVGest</button>')+'</div><div style=height:16px></div>'+panel('Observações georreferenciadas','Pragas, falhas, erosão e encharcamento com evidência de campo',observations,'<button class=primary-button data-action=field-observation>'+icon('plus')+'Registrar ponto</button>')+'</div>';
 }
 
 function safeMapText(value) {
@@ -1643,7 +1651,7 @@ registerPrototypeForm('purchase_receipt','COMPRAS · RECEBIMENTO','Receber pedid
 function decorateView() {
   clarifyPrototypeStatus();
   const pageEyebrow = content.querySelector('.page-head .eyebrow');
-  if (pageEyebrow && !content.querySelector('.season-context')) pageEyebrow.insertAdjacentHTML('afterend','<span class=season-context>Safra '+state.season+'</span>');
+  if (pageEyebrow && !content.querySelector('.season-context')) pageEyebrow.insertAdjacentHTML('afterend','<span class=season-context>'+seasonContextLabel(state.view)+'</span>');
   bindViewInteractions();
 }
 
@@ -2047,7 +2055,7 @@ function showToast(title, message) {
   showToast.timer = setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
-function exportCurrentView() {
+function exportRows() {
   const grainExports = {
     milho: [['colheita','32880','sc'],['cargas','84','carga'],['preco_medio','61.80','BRL/sc'],['contas_a_receber','428000','BRL']],
     soja: [['colheita','41230','sc'],['cargas','126','carga'],['preco_medio','128.40','BRL/sc'],['contas_a_receber','312000','BRL']],
@@ -2070,11 +2078,16 @@ function exportCurrentView() {
     })
     : [];
   const rows = state.view === 'grains'
-    ? [['modulo','safra','cultura','indicador','valor','unidade'], ...grainExports[state.grainCrop].map(row => ['cereais',state.season,state.grainCrop,...row])]
+    ? [['modulo','safra','cultura','indicador','valor','unidade'], ...grainExports[state.grainCrop].map(row => ['cereais',dataSeason('grains'),state.grainCrop,...row])]
     : [['modulo','safra','indicador','valor','unidade'], ...[...content.querySelectorAll('.metric-card')].map(card => {
       const value = card.querySelector('.metric-value');
-      return [state.view,state.season,card.dataset.exportLabel || card.querySelector('.metric-top span')?.textContent.trim() || 'indicador', value?.dataset.exportValue || value?.textContent.trim() || '', value?.dataset.exportUnit || ''];
+      return [state.view,dataSeason(state.view),card.dataset.exportLabel || card.querySelector('.metric-top span')?.textContent.trim() || 'indicador', value?.dataset.exportValue || value?.textContent.trim() || '', value?.dataset.exportUnit || ''];
     }), ...budgetRowsCsv];
+  return rows;
+}
+
+function exportCurrentView() {
+  const rows = exportRows();
   const csv = '\ufeff' + rows.map(row => row.join(';')).join('\n');
   const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);

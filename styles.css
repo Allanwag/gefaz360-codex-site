@@ -671,7 +671,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 @media (max-width: 680px) {
   .topbar { height: 62px; padding: 0 16px; }
   .content { min-height: calc(100vh - 62px); padding: 20px 15px 30px; }
-  .breadcrumb span, .breadcrumb i, .season-select, .notification-button { display: none; }
+  .breadcrumb span, .breadcrumb i, .notification-button { display: none; }
+  .season-select { padding: 0 6px; }
+  .season-select i { display: none; }
+  .season-select select { max-width: 96px; }
   .global-add span { display: none; }
   .global-add { width: 38px; padding: 0; }
   .page-head { align-items: flex-start; flex-direction: column; gap: 14px; }
