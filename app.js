@@ -778,7 +778,7 @@ function renderGrains() {
       description:'Acompanhe milho, soja, sorgo e trigo por colheita e expedição; nas coberturas, controle área implantada, sementes, custo e execução por talhão.',
       primary:config.isCover?'Registrar implantação':'Registrar saída',
       action:config.isCover?'grain-cover':'open-modal',
-      secondary:{label:config.isCover?'Exportar operações':'Exportar cargas',icon:'download',action:'export'}
+      secondary:{label:config.isCover?'Exportar indicadores':'Exportar indicadores',icon:'download',action:'export'}
     })}
     <div class="subnav grain-tabs" role="tablist" aria-label="Selecionar cultura">${tabs}</div>
     <section class="metric-grid">${config.metrics.map(metric=>metricCard(metric)).join('')}</section>
@@ -801,7 +801,7 @@ function renderLoadsLegacy() {
     ['MIL-081','Milho','Volvo VM 330 · GHT-9B12','31.880 kg','Armazém Central','NF 000.182','R$ 32.836','Pago']
   ];
   content.innerHTML = `<div class="page-enter">
-    ${pageHead({eyebrow:'LOGÍSTICA & FATURAMENTO',title:'Cargas e documentos fiscais.',description:'Rastreabilidade única do ticket de balança ao pagamento, com bloqueios automáticos para divergências de peso, NF e contrato.',primary:'Nova saída',secondary:{label:'Exportar CSV',icon:'download',action:'export'}})}
+    ${pageHead({eyebrow:'LOGÍSTICA & FATURAMENTO',title:'Cargas e documentos fiscais.',description:'Rastreabilidade única do ticket de balança ao pagamento, com bloqueios automáticos para divergências de peso, NF e contrato.',primary:'Nova saída',secondary:{label:'Exportar indicadores',icon:'download',action:'export'}})}
     <section class="metric-grid">
       ${metricCard({label:'No pátio agora',value:'4',unit:'caminhões',iconName:'truck',delta:'38 min',foot:'tempo médio',tone:'blue',neutral:true})}
       ${metricCard({label:'Expedido hoje',value:'283,4',unit:'t',iconName:'scale',delta:'+9,2%',foot:'versus programação',tone:'green'})}
@@ -1261,7 +1261,7 @@ function plotTimelineEvents() {
 function soilTimelineTab() {
   const events = plotTimelineEvents();
   const body = events.length ? '<div class=plot-timeline>'+events.map(item => '<article class=timeline-event><div class=timeline-marker>'+icon(item.icon || 'clipboard')+'</div><div class=timeline-card><div class=timeline-event-head><div><span>'+item.date+'</span><h3>'+item.title+'</h3></div><span class=status>'+item.type+'</span></div><strong>'+item.plot+'</strong><p>'+item.detail+'</p></div></article>').join('')+'</div>' : '<div class=empty-state>Nenhum evento cadastrado para este talhão e safra.</div>';
-  return panel('Linha do tempo do talhão','Solo, correções, adubações, podas, manejos culturais, pulverizações e colheitas em ordem cronológica',body,'<button class=secondary-button data-action=export>'+icon('download')+'Exportar histórico</button>');
+  return panel('Linha do tempo do talhão','Solo, correções, adubações, podas, manejos culturais, pulverizações e colheitas em ordem cronológica',body,'<button class=secondary-button data-action=export>'+icon('download')+'Exportar indicadores</button>');
 }
 
 function renderSoil() {
@@ -1273,7 +1273,7 @@ function renderSoil() {
   const cultural = culturalManagementRecords.filter(item => item.season === state.season && (state.soilPlot === 'Todos' || item.plot === state.soilPlot));
   const amendedArea = amendments.reduce((sum,item) => sum + item.area,0);
   const pruningArea = prunings.reduce((sum,item) => sum + item.area,0);
-  const actions = state.soilTab === 'amendments' ? {primary:'Registrar adubação',action:'fertilization',secondary:{label:'Registrar calagem',icon:'layers',action:'liming'}} : state.soilTab === 'pruning' ? {primary:'Registrar poda',action:'pruning',secondary:{label:'Exportar histórico',icon:'download',action:'export'}} : state.soilTab === 'cultural' ? {primary:'Capina / roçada',action:'weeding-mowing',secondary:{label:'Arruação / esparramação',icon:'sprout',action:'yarding-spreading'}} : {primary:'Cadastrar análise anterior',action:'soil-analysis',secondary:{label:'Importar laudo',icon:'upload',action:'soil-import'}};
+  const actions = state.soilTab === 'amendments' ? {primary:'Registrar adubação',action:'fertilization',secondary:{label:'Registrar calagem',icon:'layers',action:'liming'}} : state.soilTab === 'pruning' ? {primary:'Registrar poda',action:'pruning',secondary:{label:'Exportar indicadores',icon:'download',action:'export'}} : state.soilTab === 'cultural' ? {primary:'Capina / roçada',action:'weeding-mowing',secondary:{label:'Arruação / esparramação',icon:'sprout',action:'yarding-spreading'}} : {primary:'Cadastrar análise anterior',action:'soil-analysis',secondary:{label:'Importar laudo',icon:'upload',action:'soil-import'}};
   const head = pageHead({eyebrow:'GESTÃO AGRONÔMICA',title:'Solo & talhões · '+state.season+'.',description:'Preserve o histórico de fertilidade e reúna análises, correções, adubações, podas e demais operações em uma linha do tempo por talhão.',primary:actions.primary,action:actions.action,secondary:actions.secondary});
   const metrics = '<section class=metric-grid>'+metricCard({label:'Análises de solo',value:String(records.length),unit:'laudos',iconName:'clipboard',delta:String(new Set(records.map(item => item.plot)).size)+' talhões',foot:'no filtro selecionado'})+metricCard({label:'Adubações e correções',value:String(amendments.length),unit:'operações',iconName:'package',delta:fmtBR(amendedArea,1)+' ha somados',foot:'registros da safra',tone:'blue'})+metricCard({label:'Área de podas',value:fmtBR(pruningArea,1),unit:'ha',iconName:'sprout',delta:String(prunings.length)+' operações',foot:'por talhão e tipo',tone:'gold'})+metricCard({label:'Manejo cultural',value:String(cultural.length),unit:'operações',iconName:'wrench',delta:fmtBR(cultural.reduce((sum,item) => sum + item.area,0),1)+' ha somados',foot:'capina, roçada e preparo',tone:'orange'})+'</section>';
   const tabBody = state.soilTab === 'amendments' ? soilAmendmentsTab() : state.soilTab === 'pruning' ? soilPruningTab() : state.soilTab === 'cultural' ? soilCulturalTab() : state.soilTab === 'timeline' ? soilTimelineTab() : soilAnalysisTab(records);
@@ -1518,7 +1518,7 @@ function renderRoadmapLegacy() {
     ['P2 · 6 A 12 MESES','Previsão de produção e caixa','Usar histórico por talhão, ritmo de colheita, contratos e cenários de preço para revisar semanalmente volume, margem e necessidade de capital.',['Planejamento','Cenários','Decisão']]
   ];
   content.innerHTML = `<div class="page-enter">
-    ${pageHead({eyebrow:'EVOLUÇÃO DO PRODUTO',title:'Melhorias guiadas por impacto.',description:'Roadmap recomendado para transformar o PVgest em uma plataforma integrada sem perder a simplicidade operacional que o campo exige.',primary:'',secondary:{label:'Exportar roadmap',icon:'download',action:'export'},meta:false})}
+    ${pageHead({eyebrow:'EVOLUÇÃO DO PRODUTO',title:'Melhorias guiadas por impacto.',description:'Roadmap recomendado para transformar o PVgest em uma plataforma integrada sem perder a simplicidade operacional que o campo exige.',primary:'',secondary:'',meta:false})}
     <div class="two-col">
       <section><div class="roadmap-grid">${recs.map(r=>`<article class="roadmap-card"><div class="roadmap-card-top"><span>${r[0]}</span><span class="status">Recomendado</span></div><h3>${r[1]}</h3><p>${r[2]}</p><div class="impact-row">${r[3].map(x=>`<span class="impact-chip">${x}</span>`).join('')}</div></article>`).join('')}</div></section>
       <aside class="stack">
@@ -2149,13 +2149,20 @@ function showToast(title, message) {
   showToast.timer = setTimeout(() => toast.classList.remove('show'), 3500);
 }
 
+// Número vira texto pt-BR (vírgula decimal, sem milhar); texto com ; " ou quebra de linha vai entre aspas.
+function csvCell(valor) {
+  if (typeof valor === 'number') return String(valor).replace('.', ',');
+  const texto = String(valor ?? '');
+  return /[;"\r\n]/.test(texto) ? '"' + texto.replace(/"/g, '""') + '"' : texto;
+}
+
 function exportRows() {
   const grainExports = {
-    milho: [['colheita','32880','sc'],['cargas','84','carga'],['preco_medio','61.80','BRL/sc'],['contas_a_receber','428000','BRL']],
-    soja: [['colheita','41230','sc'],['cargas','126','carga'],['preco_medio','128.40','BRL/sc'],['contas_a_receber','312000','BRL']],
-    sorgo: [['colheita','12640','sc'],['cargas','31','carga'],['preco_medio','52.70','BRL/sc'],['contas_a_receber','186000','BRL']],
-    trigo: [['colheita','9480','sc'],['cargas','24','carga'],['preco_medio','78.90','BRL/sc'],['contas_a_receber','142000','BRL']],
-    coberturas: [['area_implantada','286','ha'],['operacoes','18','talhao'],['custo_medio','412','BRL/ha'],['sementes_a_distribuir','5.8','t']]
+    milho: [['colheita',32880,'sc'],['cargas',84,'carga'],['preco_medio',61.8,'BRL/sc'],['contas_a_receber',428000,'BRL']],
+    soja: [['colheita',41230,'sc'],['cargas',126,'carga'],['preco_medio',128.4,'BRL/sc'],['contas_a_receber',312000,'BRL']],
+    sorgo: [['colheita',12640,'sc'],['cargas',31,'carga'],['preco_medio',52.7,'BRL/sc'],['contas_a_receber',186000,'BRL']],
+    trigo: [['colheita',9480,'sc'],['cargas',24,'carga'],['preco_medio',78.9,'BRL/sc'],['contas_a_receber',142000,'BRL']],
+    coberturas: [['area_implantada',286,'ha'],['operacoes',18,'talhao'],['custo_medio',412,'BRL/ha'],['sementes_a_distribuir',5.8,'t']]
   };
   // O orçamento entra no mesmo formato longo dos demais indicadores, uma linha por
   // medida, para o CSV do financeiro não virar um schema à parte. Segue a safra
@@ -2182,7 +2189,11 @@ function exportRows() {
 
 function exportCurrentView() {
   const rows = exportRows();
-  const csv = '\ufeff' + rows.map(row => row.join(';')).join('\n');
+  if (rows.length < 2) {
+    showToast('Nada para exportar','Esta tela não tem indicadores para o arquivo.');
+    return false;
+  }
+  const csv = '\ufeff' + rows.map(row => row.map(csvCell).join(';')).join('\n');
   const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -2190,6 +2201,7 @@ function exportCurrentView() {
   a.href = url; a.download = `gefaz360-${exportScope}-demonstrativo.csv`; a.click();
   URL.revokeObjectURL(url);
   showToast('Arquivo exportado','O CSV demonstrativo foi gerado com identificação de safra e unidade.');
+  return true;
 }
 
 function openSidebar() {
