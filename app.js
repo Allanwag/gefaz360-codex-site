@@ -58,6 +58,17 @@ function plainActivityText(value) {
     .replace(/>/g,'&gt;');
 }
 
+// O valor ilegível vai para uma chave à parte antes que o próximo salvamento sobrescreva a original.
+// Uma cópia já guardada não é substituída: vale a primeira versão ilegível encontrada.
+function preserveCorruptedValue(key, raw) {
+  try {
+    const copia = key + '-corrompido';
+    if (localStorage.getItem(copia) === null) localStorage.setItem(copia, raw);
+  } catch (error) {
+    // sem espaço ou sem armazenamento: o aviso de recuperação continua valendo
+  }
+}
+
 function readStoredArray(key) {
   let raw;
   try {
@@ -73,6 +84,7 @@ function readStoredArray(key) {
   } catch (error) {
     // O valor original permanece no navegador para recuperação manual.
   }
+  preserveCorruptedValue(key, raw);
   storageRecoveryKeys.push(key);
   return [];
 }
@@ -106,13 +118,25 @@ function normalizeActivities(items) {
     return [{
       icon:String(item.icon || 'check'),
       title:plainActivityText(item.title || 'Atividade local'),
-      meta:plainActivityText(item.meta || '')
+      meta:plainActivityText(String(item.meta || '').replace(/^Agora · ?/,'')),
+      at:item.at && Number.isFinite(Date.parse(item.at)) ? String(item.at) : null
     }];
   }).slice(0,5);
 }
 
+function activityAge(at, agora = Date.now()) {
+  const quando = Date.parse(at);
+  if (!at || !Number.isFinite(quando)) return '';
+  const minutos = Math.floor((agora - quando) / 60000);
+  if (minutos < 1) return 'Agora';
+  if (minutos < 60) return 'Há '+minutos+' min';
+  if (minutos < 1440) return 'Há '+Math.floor(minutos / 60)+' h';
+  const dia = new Date(quando);
+  return String(dia.getDate()).padStart(2,'0')+'/'+String(dia.getMonth() + 1).padStart(2,'0')+'/'+dia.getFullYear();
+}
+
 function saveActivity(activity) {
-  const nextActivities = [activity, ...state.activities].slice(0,5);
+  const nextActivities = [{...activity, at:new Date().toISOString()}, ...state.activities].slice(0,5);
   try {
     localStorage.setItem('pvgest-activities', JSON.stringify(nextActivities));
   } catch (error) {
@@ -300,7 +324,7 @@ function recentActivities() {
     { icon: 'receipt', title: 'NF-e 000.184 autorizada pela SEFAZ', meta: 'Há 1h · R$ 86.420,00' },
     { icon: 'wrench', title: 'OS #184 movida para “Em execução”', meta: 'Há 2h · Trator JD 7230J' }
   ];
-  return [...state.activities, ...defaults].slice(0, 5).map(a => `<div class="activity"><span class="activity-icon">${icon(a.icon || 'check')}</span><span><strong>${a.title}</strong><small>${a.meta}</small></span></div>`).join('');
+  return [...state.activities, ...defaults].slice(0, 5).map(a => `<div class="activity"><span class="activity-icon">${icon(a.icon || 'check')}</span><span><strong>${a.title}</strong><small>${[activityAge(a.at), a.meta].filter(Boolean).join(' · ')}</small></span></div>`).join('');
 }
 
 function renderDashboard() {
@@ -571,6 +595,7 @@ function caldaPanel() {
 }
 
 function registrarResultadoCalda(res) {
+  res = res || {};
   const receita = currentSprayRecipe();
   const rotulo = (res && res.resumo && res.resumo.rotulo) || (res && res.status) || 'Sem resultado';
   const resumo = document.getElementById('calda-resumo');
@@ -579,8 +604,8 @@ function registrarResultadoCalda(res) {
     resumo.innerHTML = `<span class="status ${cls}">${plainActivityText(rotulo)}</span><span>confiança ${Math.round((res.confianca || 0) * 100)}%</span>`;
   }
   const title = plainActivityText('Gefaz Calda: ' + rotulo + ' · ' + receita.nome);
-  if (state.activities[0] && state.activities[0].title === title) return; // mesma receita reanalisada: não duplica
-  if (!saveActivity({ icon: res.status === 'incompativel' ? 'alert' : 'check', title, meta: plainActivityText('Agora · ' + receita.cultura + ' · ' + receita.alvo) })) {
+  if (state.activities.some(item => item.title === title)) return; // mesma receita reanalisada: não duplica nem ocupa outra vaga
+  if (!saveActivity({ icon: res.status === 'incompativel' ? 'alert' : 'check', title, meta: plainActivityText(receita.cultura + ' · ' + receita.alvo) })) {
     showToast('Resultado não guardado','A análise foi exibida, mas o armazenamento local está indisponível ou sem espaço.');
   }
 }
@@ -2255,7 +2280,7 @@ document.getElementById('recordForm').addEventListener('submit', e => {
     }
     state.importedMaps = nextMaps;
     state.pendingMapImport = null;
-    const activitySaved = saveActivity({icon:'map',title:plainActivityText('Mapa KML importado · '+importedRecord.name),meta:'Agora · '+importedRecord.features.length+' feição'+(importedRecord.features.length===1?'':'ões')});
+    const activitySaved = saveActivity({icon:'map',title:plainActivityText('Mapa KML importado · '+importedRecord.name),meta:importedRecord.features.length+' feição'+(importedRecord.features.length===1?'':'ões')});
     closeModal();
     showToast('Mapa importado',activitySaved
       ? 'O arquivo '+importedRecord.fileName+' foi convertido, desenhado e salvo neste navegador.'
@@ -2265,7 +2290,7 @@ document.getElementById('recordForm').addEventListener('submit', e => {
     return;
   }
   const detail = [...formData.values()].find(v => typeof v === 'string' && v.trim()) || config.title;
-  if (!saveActivity({ icon: config.icon, title: plainActivityText(config.activity), meta: plainActivityText(`Agora · ${String(detail).slice(0,42)}`) })) {
+  if (!saveActivity({ icon: config.icon, title: plainActivityText(config.activity), meta: plainActivityText(String(detail).slice(0,42)) })) {
     showToast('Registro não salvo','O armazenamento deste navegador está indisponível ou sem espaço. Libere espaço e tente novamente.');
     return;
   }
