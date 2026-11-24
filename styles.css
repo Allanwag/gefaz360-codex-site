@@ -675,7 +675,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .breadcrumb span, .breadcrumb i, .notification-button { display: none; }
   .season-select { padding: 0 6px; }
   .season-select i { display: none; }
-  .season-select select { max-width: 96px; }
+  .season-select select { max-width: 120px; }
   .global-add span { display: none; }
   .global-add { width: 38px; padding: 0; }
   .page-head { align-items: flex-start; flex-direction: column; gap: 14px; }
