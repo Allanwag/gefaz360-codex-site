@@ -92,11 +92,11 @@ function normalizeMapFeatures(features) {
 }
 
 function normalizeImportedMaps(items) {
-  return items.flatMap(item => {
+  return items.flatMap((item, index) => {
     if (!item || typeof item !== 'object') return [];
     const features = normalizeMapFeatures(item.features);
     if (!features.length) return [];
-    return [{...item,features}];
+    return [{...item,id:String(item.id || 'MAP-legado-'+index),features}];
   }).slice(0,20);
 }
 
@@ -1273,6 +1273,78 @@ function safeMapText(value) {
   return String(value || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// ---- Leitura de KML -----------------------------------------------------------------------
+function parseKmlCoordinates(texto) {
+  return String(texto || '').trim().split(/\s+/).map(valor => valor.split(',').slice(0,2).map(Number)).filter(ponto => ponto.length === 2 && ponto.every(Number.isFinite));
+}
+
+function coordinatesInRange(coords) {
+  return coords.every(ponto => Math.abs(ponto[0]) <= 180 && Math.abs(ponto[1]) <= 90);
+}
+
+// O anel externo é o contorno do polígono; innerBoundaryIs são furos e podem vir antes dele.
+function polygonRing(geometry) {
+  const outer = geometry.getElementsByTagName('outerBoundaryIs')[0];
+  const node = (outer || geometry).getElementsByTagName('coordinates')[0];
+  return parseKmlCoordinates(node && node.textContent);
+}
+
+function geometryCoordinates(geometry) {
+  const node = geometry.getElementsByTagName('coordinates')[0];
+  return parseKmlCoordinates(node && node.textContent);
+}
+
+function kmlFeaturesFromDocument(xml) {
+  const features = [];
+  const rejeitadas = [];
+  [...xml.getElementsByTagName('Placemark')].forEach((placemark,placemarkIndex) => {
+    const nameNode = placemark.getElementsByTagName('name')[0];
+    const featureName = nameNode && nameNode.textContent.trim() || 'Feição '+(placemarkIndex+1);
+    const add = (type, minimum, pick) => [...placemark.getElementsByTagName(type)].forEach((geometry,index) => {
+      const nome = index ? featureName+' '+(index+1) : featureName;
+      const coordinates = pick(geometry);
+      if (coordinates.length < minimum) {
+        rejeitadas.push(nome+': '+(minimum === 1 ? 'sem coordenadas' : 'menos de '+minimum+' vértices'));
+        return;
+      }
+      if (!coordinatesInRange(coordinates)) {
+        rejeitadas.push(nome+': coordenadas fora de longitude/latitude (o arquivo parece estar em UTM)');
+        return;
+      }
+      features.push({type:type,name:nome,coordinates:type === 'Point' ? [coordinates[0]] : coordinates});
+    });
+    add('Polygon',3,polygonRing);
+    add('LineString',2,geometryCoordinates);
+    add('Point',1,geometryCoordinates);
+  });
+  return {features:features,rejeitadas:rejeitadas};
+}
+
+// 'ask' = há duplicata e a regra escolhida não diz o que fazer: o usuário precisa decidir.
+function duplicateDecision(estrategia, existe) {
+  if (!existe) return 'add';
+  if (String(estrategia).includes('Atualizar')) return 'replace';
+  if (String(estrategia).includes('Ignorar')) return 'skip';
+  if (String(estrategia).includes('Criar nova versão')) return 'add';
+  return 'ask';
+}
+
+function removeImportedMap(id) {
+  const next = state.importedMaps.filter(item => item.id !== id);
+  if (next.length === state.importedMaps.length) return false;
+  try {
+    localStorage.setItem('gefaz360-imported-maps',JSON.stringify(next));
+  } catch (error) {
+    return false;
+  }
+  state.importedMaps = next;
+  return true;
+}
+
+function safeMapAttr(value) {
+  return safeMapText(value).replace(/"/g,'&quot;');
+}
+
 function importedMapOverlay() {
   const mapRecords = state.importedMaps.filter(item => Array.isArray(item.features) && item.features.length);
   const features = mapRecords.flatMap(item => item.features.map(feature => ({...feature,mapName:item.name,fileName:item.fileName})));
@@ -1305,7 +1377,7 @@ function importedMapOverlay() {
 
 function mapImportPanel() {
   const sources = '<div class=map-import-grid><article><span class=import-source-icon>'+icon('upload')+'</span><div><strong>Arquivo cartográfico</strong><small>KML, KMZ, GeoJSON, GeoPackage ou pacote QGIS</small></div><b>Importação local</b></article><article><span class=import-source-icon>'+icon('map')+'</span><div><strong>Google Earth</strong><small>Link KML/KMZ publicado ou arquivo exportado do projeto</small></div><b>Link direto</b></article><article><span class=import-source-icon>'+icon('layers')+'</span><div><strong>QGIS</strong><small>WFS, QGIS Server ou pacote de projeto com camadas</small></div><b>Serviço sincronizável</b></article></div>';
-  const importedRecords = state.importedMaps.length ? '<div class=imported-records>'+state.importedMaps.slice(0,4).map(item => '<article><span class=import-source-icon>'+icon('check')+'</span><div><strong>'+safeMapText(item.name)+'</strong><small>'+safeMapText(item.fileName)+' · '+item.features.length+' feição'+(item.features.length===1?'':'ões')+' · '+safeMapText(item.importTarget)+'</small></div><b>Importado · '+new Date(item.importedAt).toLocaleString('pt-BR')+'</b></article>').join('')+'</div><div style=height:16px></div>' : '';
+  const importedRecords = state.importedMaps.length ? '<div class=imported-records>'+state.importedMaps.map(item => '<article><span class=import-source-icon>'+icon('check')+'</span><div><strong>'+safeMapText(item.name)+'</strong><small>'+safeMapText(item.fileName)+' · '+item.features.length+' feição'+(item.features.length===1?'':'ões')+' · '+safeMapText(item.importTarget)+'</small></div><button class="icon-button" data-map-remove="'+safeMapAttr(item.id)+'" aria-label="Excluir mapa '+safeMapAttr(item.name)+'">'+icon('close')+'</button><b>Importado · '+new Date(item.importedAt).toLocaleString('pt-BR')+'</b></article>').join('')+'</div><div style=height:16px></div>' : '';
   const history = '<div class=table-wrap><table class=data-table><thead><tr><th>Importação / origem</th><th>Formato / serviço</th><th>CRS original</th><th>Camadas</th><th>Feições</th><th>Destino</th><th>Validação</th><th>Situação</th></tr></thead><tbody><tr><td><strong>MAP-018</strong><small>talhoes_santa_helena.kml</small></td><td>Arquivo KML</td><td>EPSG:4326</td><td>Limites + carreadores</td><td>28</td><td>Talhões</td><td><span class=status>Geometrias válidas</span></td><td><span class=status>Importado</span></td></tr><tr><td><strong>MAP-017</strong><small>Projeto Google Earth · Safra 25/26</small></td><td>Network Link KML</td><td>WGS 84</td><td>Pontos MIP</td><td>148</td><td>Observações</td><td><span class=status-info>Atualização diária</span></td><td><span class=status>Sincronizado</span></td></tr><tr><td><strong>MAP-016</strong><small>QGIS Server · Fazenda Horizonte</small></td><td>WFS 2.0</td><td>EPSG:31983</td><td>NDVI + zonas</td><td>64</td><td>Camadas agronômicas</td><td><span class=status-warning>Transformar CRS</span></td><td><span class=status-info>Configurado</span></td></tr></tbody></table></div>';
   return panel('Importação de mapas','Traga limites, pontos, linhas, zonas e estilos por arquivo ou serviço, sempre com pré-validação antes de substituir dados',importedRecords+sources+'<div style=height:16px></div>'+history,'<button class=primary-button data-action=map-import>'+icon('upload')+'Importar mapa</button>');
 }
@@ -1609,7 +1681,7 @@ registerPrototypeForm('whatsapp_entry','CAMPO CONECTADO · WHATSAPP','Revisar en
 
 registerPrototypeForm('field_observation','MAPA & MIP','Registrar observação georreferenciada','Observação registrada','Novo ponto de campo com GPS e evidências','map','<div class=form-grid><div class=form-field><label>Talhão</label><select name=plot>'+agronomicPlotOptions+'</select></div><div class=form-field><label>Data e hora</label><input name=observed_at type=datetime-local value=2026-07-25T11:00 required></div><div class=form-field><label>Latitude</label><input name=latitude type=number step=0.000001 value=-20.7112 required></div><div class=form-field><label>Longitude</label><input name=longitude type=number step=0.000001 value=-46.6158 required></div><div class=form-field><label>Tipo</label><select name=observation_type><option>Praga ou doença</option><option>Falha de stand</option><option>Erosão</option><option>Encharcamento</option><option>Planta daninha</option><option>Outro</option></select></div><div class=form-field><label>Severidade</label><select name=severity><option>Baixa</option><option>Média</option><option>Alta</option><option>Crítica</option></select></div><div class=form-field full><label>Fotos com GPS</label><input name=photos type=file accept=image/* multiple></div><div class=form-field full><label>Observações</label><textarea name=notes></textarea></div></div>');
 
-registerPrototypeForm('map_import','MAPA & MIP · IMPORTAÇÃO','Importar mapa ou configurar conexão','Mapa validado para importação','Nova fonte cartográfica validada e registrada','upload','<div class=form-stack><div class=form-section><div class=form-section-head><strong>Origem do mapa</strong><span>Arquivo ou conexão direta</span></div><div class=form-grid><div class=form-field><label>Fonte</label><select name=source_type data-map-source><option value=FILE>Arquivo KML, KMZ ou geodados</option><option value=GOOGLE_EARTH>Google Earth · link KML/KMZ</option><option value=QGIS_SERVICE>QGIS · WFS ou QGIS Server</option><option value=QGIS_PROJECT>QGIS · pacote de projeto</option></select></div><div class=form-field><label>Identificação</label><input name=import_name value=Mapa-safra-2025-26 required></div></div></div><div class=form-section data-source-group=FILE><div class=form-section-head><strong>Arquivo cartográfico</strong><span>Leitura local do KML antes do envio</span></div><div class=form-grid><div class=form-field full><label>Arquivo</label><input name=map_file type=file accept=.kml,.kmz,.geojson,.json,.gpkg,.qgz,.zip></div><div class=form-note>KML é analisado no navegador para contar Placemark, pontos, linhas e polígonos. KMZ, GeoPackage e pacotes QGIS seguem para processamento no servidor central.</div></div></div><div class=form-section data-source-group=GOOGLE_EARTH><div class=form-section-head><strong>Google Earth</strong><span>Network Link ou arquivo publicado</span></div><div class=form-grid><div class=form-field full><label>URL KML/KMZ publicada</label><input name=google_earth_url type=url placeholder=https://exemplo.com/projeto.kml></div><div class=form-field><label>Atualização</label><select name=google_refresh_mode><option>Importar uma vez</option><option>Sincronizar diariamente</option><option>Sincronizar a cada hora</option></select></div><div class=form-field><label>Autorização</label><select name=google_auth_mode><option>Link público ou assinado</option><option>Google Drive · credencial futura</option></select></div><div class=form-note>Projetos privados do Google Earth exigem exportação KML/KMZ ou autorização por Google Drive. O Gefaz360 nunca solicita a senha pessoal do usuário.</div></div></div><div class=form-section data-source-group=QGIS_SERVICE><div class=form-section-head><strong>QGIS por serviço</strong><span>WFS ou QGIS Server publicado</span></div><div class=form-grid><div class=form-field full><label>URL do serviço</label><input name=qgis_service_url type=url placeholder=https://geo.exemplo.com/qgisserver></div><div class=form-field><label>Protocolo</label><select name=qgis_service_type><option>WFS 2.0</option><option>WFS 1.1</option><option>QGIS Server</option></select></div><div class=form-field><label>Camada</label><input name=qgis_layer_name placeholder=fazenda:talhoes></div><div class=form-field><label>Usuário técnico</label><input name=qgis_service_user autocomplete=off></div><div class=form-field><label>Referência da credencial</label><input name=qgis_credential_ref placeholder=cofre/qgis-fazenda></div><div class=form-note>A senha ou token deve ficar no cofre do servidor. O navegador salva somente a referência segura da credencial.</div></div></div><div class=form-section data-source-group=QGIS_PROJECT><div class=form-section-head><strong>Pacote QGIS</strong><span>Projeto e dados portáveis</span></div><div class=form-grid><div class=form-field full><label>Arquivo QGZ, GeoPackage ou ZIP</label><input name=qgis_project_file type=file accept=.qgz,.gpkg,.zip,.qml></div><div class=form-field full><label>Camadas a importar</label><input name=qgis_project_layers placeholder=talhoes-zonas-mip-carreadores></div></div></div><div class=form-section><div class=form-section-head><strong>Validação e destino</strong><span>Nada substitui o mapa antes da conferência</span></div><div class=form-grid><div class=form-field><label>CRS de origem</label><input name=source_crs value=EPSG:4326></div><div class=form-field><label>CRS de destino</label><input name=target_crs value=EPSG:4326 readonly></div><div class=form-field><label>Destino das feições</label><select name=import_target><option>Limites de talhão</option><option>Observações MIP</option><option>Zonas de manejo</option><option>Carreadores e infraestrutura</option><option>Camada agronômica</option></select></div><div class=form-field><label>Duplicidades</label><select name=duplicate_strategy><option>Pré-visualizar e decidir</option><option>Atualizar pelo código</option><option>Criar nova versão</option><option>Ignorar existentes</option></select></div><div class=form-field><label>Geometrias inválidas</label><select name=invalid_geometry_strategy><option>Bloquear importação</option><option>Tentar corrigir e revisar</option><option>Ignorar com relatório</option></select></div><div class=form-field><label>Estilos QGIS / KML</label><select name=style_strategy><option>Importar quando compatível</option><option>Usar padrão Gefaz360</option><option>Não importar estilos</option></select></div><div class=form-field full><label>Mapeamento de atributos</label><textarea name=attribute_mapping>codigo → código do talhão; nome → nome; area_ha → área; cultura → cultura</textarea></div><div class=form-field full><label>Pré-validação</label><textarea name=import_summary readonly>Aguardando arquivo ou configuração da fonte.</textarea></div><div class=form-note>O sistema valida CRS, geometrias, área, sobreposição, códigos duplicados e atributos obrigatórios. A importação confirmada gera nova versão e preserva o mapa anterior.</div></div></div></div>');
+registerPrototypeForm('map_import','MAPA & MIP · IMPORTAÇÃO','Importar mapa ou configurar conexão','Mapa validado para importação','Nova fonte cartográfica validada e registrada','upload','<div class=form-stack><div class=form-section><div class=form-section-head><strong>Origem do mapa</strong><span>Arquivo ou conexão direta</span></div><div class=form-grid><div class=form-field><label>Fonte</label><select name=source_type data-map-source><option value=FILE>Arquivo KML, KMZ ou geodados</option><option value=GOOGLE_EARTH>Google Earth · link KML/KMZ</option><option value=QGIS_SERVICE>QGIS · WFS ou QGIS Server</option><option value=QGIS_PROJECT>QGIS · pacote de projeto</option></select></div><div class=form-field><label>Identificação</label><input name=import_name placeholder="Nome do documento KML"></div></div></div><div class=form-section data-source-group=FILE><div class=form-section-head><strong>Arquivo cartográfico</strong><span>Leitura local do KML antes do envio</span></div><div class=form-grid><div class=form-field full><label>Arquivo</label><input name=map_file type=file accept=.kml,.kmz,.geojson,.json,.gpkg,.qgz,.zip></div><div class=form-note>KML é analisado no navegador para contar Placemark, pontos, linhas e polígonos. KMZ, GeoPackage e pacotes QGIS seguem para processamento no servidor central.</div></div></div><div class=form-section data-source-group=GOOGLE_EARTH><div class=form-section-head><strong>Google Earth</strong><span>Network Link ou arquivo publicado</span></div><div class=form-grid><div class=form-field full><label>URL KML/KMZ publicada</label><input name=google_earth_url type=url placeholder=https://exemplo.com/projeto.kml></div><div class=form-field><label>Atualização</label><select name=google_refresh_mode><option>Importar uma vez</option><option>Sincronizar diariamente</option><option>Sincronizar a cada hora</option></select></div><div class=form-field><label>Autorização</label><select name=google_auth_mode><option>Link público ou assinado</option><option>Google Drive · credencial futura</option></select></div><div class=form-note>Projetos privados do Google Earth exigem exportação KML/KMZ ou autorização por Google Drive. O Gefaz360 nunca solicita a senha pessoal do usuário.</div></div></div><div class=form-section data-source-group=QGIS_SERVICE><div class=form-section-head><strong>QGIS por serviço</strong><span>WFS ou QGIS Server publicado</span></div><div class=form-grid><div class=form-field full><label>URL do serviço</label><input name=qgis_service_url type=url placeholder=https://geo.exemplo.com/qgisserver></div><div class=form-field><label>Protocolo</label><select name=qgis_service_type><option>WFS 2.0</option><option>WFS 1.1</option><option>QGIS Server</option></select></div><div class=form-field><label>Camada</label><input name=qgis_layer_name placeholder=fazenda:talhoes></div><div class=form-field><label>Usuário técnico</label><input name=qgis_service_user autocomplete=off></div><div class=form-field><label>Referência da credencial</label><input name=qgis_credential_ref placeholder=cofre/qgis-fazenda></div><div class=form-note>A senha ou token deve ficar no cofre do servidor. O navegador salva somente a referência segura da credencial.</div></div></div><div class=form-section data-source-group=QGIS_PROJECT><div class=form-section-head><strong>Pacote QGIS</strong><span>Projeto e dados portáveis</span></div><div class=form-grid><div class=form-field full><label>Arquivo QGZ, GeoPackage ou ZIP</label><input name=qgis_project_file type=file accept=.qgz,.gpkg,.zip,.qml></div><div class=form-field full><label>Camadas a importar</label><input name=qgis_project_layers placeholder=talhoes-zonas-mip-carreadores></div></div></div><div class=form-section><div class=form-section-head><strong>Validação e destino</strong><span>Nada substitui o mapa antes da conferência</span></div><div class=form-grid><div class=form-field><label>CRS de origem</label><input name=source_crs value=EPSG:4326></div><div class=form-field><label>CRS de destino</label><input name=target_crs value=EPSG:4326 readonly></div><div class=form-field><label>Destino das feições</label><select name=import_target><option>Limites de talhão</option><option>Observações MIP</option><option>Zonas de manejo</option><option>Carreadores e infraestrutura</option><option>Camada agronômica</option></select></div><div class=form-field><label>Duplicidades</label><select name=duplicate_strategy><option>Pré-visualizar e decidir</option><option>Atualizar pelo código</option><option>Criar nova versão</option><option>Ignorar existentes</option></select></div><div class=form-field><label>Geometrias inválidas</label><select name=invalid_geometry_strategy><option>Bloquear importação</option><option>Tentar corrigir e revisar</option><option>Ignorar com relatório</option></select></div><div class=form-field><label>Estilos QGIS / KML</label><select name=style_strategy><option>Importar quando compatível</option><option>Usar padrão Gefaz360</option><option>Não importar estilos</option></select></div><div class=form-field full><label>Mapeamento de atributos</label><textarea name=attribute_mapping>codigo → código do talhão; nome → nome; area_ha → área; cultura → cultura</textarea></div><div class=form-field full><label>Pré-validação</label><textarea name=import_summary readonly>Aguardando arquivo ou configuração da fonte.</textarea></div><div class=form-note>O sistema valida CRS, geometrias, área, sobreposição, códigos duplicados e atributos obrigatórios. A importação confirmada gera nova versão e preserva o mapa anterior.</div></div></div></div>');
 forms.map_import.body = forms.map_import.body
   .replace('KMZ, GeoPackage e pacotes QGIS seguem para processamento no servidor central.','KMZ, GeoJSON, GeoPackage e pacotes QGIS exigem a futura API central e não são importados neste protótipo.')
   .replace('O sistema valida CRS, geometrias, área, sobreposição, códigos duplicados e atributos obrigatórios. A importação confirmada gera nova versão e preserva o mapa anterior.','A versão produtiva validará CRS, geometrias, área, sobreposição, códigos e atributos. Neste protótipo, somente KML compatível é lido e persistido localmente.');
@@ -1715,6 +1787,13 @@ function bindViewInteractions() {
   content.querySelectorAll('[data-soil-tab]').forEach(btn => bindOnce(btn, 'click', () => { state.soilTab = btn.dataset.soilTab; rerenderView(renderSoil); }));
   content.querySelectorAll('[data-soil-plot]').forEach(btn => bindOnce(btn, 'click', () => { state.soilPlot = decodeURIComponent(btn.dataset.soilPlot); rerenderView(renderSoil); }));
   content.querySelectorAll('[data-map-layer]').forEach(btn => bindOnce(btn, 'click', () => { state.mapLayer = btn.dataset.mapLayer; rerenderView(renderMapMip); }));
+  content.querySelectorAll('[data-map-remove]').forEach(btn => bindOnce(btn, 'click', () => {
+    const item = state.importedMaps.find(map => map.id === btn.dataset.mapRemove);
+    if (!item) return;
+    if (!confirm('Excluir o mapa "'+item.name+'"? Esta ação não pode ser desfeita.')) return;
+    if (removeImportedMap(item.id)) rerenderView(renderMapMip);
+    else showToast('Mapa não excluído','O armazenamento deste navegador está indisponível.');
+  }));
   content.querySelectorAll('[data-connected-tab]').forEach(btn => bindOnce(btn, 'click', () => { state.connectedTab = btn.dataset.connectedTab; rerenderView(renderConnected); }));
   const stockSearch = document.getElementById('inventorySearch');
   if (stockSearch) bindOnce(stockSearch, 'input', () => { document.getElementById('inventoryBody').innerHTML = inventoryRows(); bindViewInteractions(); });
@@ -1907,34 +1986,17 @@ function openModal(forcedView) {
           const xml = new DOMParser().parseFromString(String(reader.result || ''),'application/xml');
           if (xml.getElementsByTagName('parsererror').length) throw new Error('KML inválido');
           const placemarks = xml.getElementsByTagName('Placemark').length;
-          const points = xml.getElementsByTagName('Point').length;
-          const lines = xml.getElementsByTagName('LineString').length;
-          const polygons = xml.getElementsByTagName('Polygon').length;
           const folders = xml.getElementsByTagName('Folder').length;
-          const parseCoordinates = node => String(node && node.textContent || '').trim().split(/\s+/).map(value => value.split(',').slice(0,2).map(Number)).filter(point => point.length === 2 && point.every(Number.isFinite));
-          const features = [];
-          [...xml.getElementsByTagName('Placemark')].forEach((placemark,placemarkIndex) => {
-            const nameNode = placemark.getElementsByTagName('name')[0];
-            const featureName = nameNode && nameNode.textContent.trim() || 'Feição '+(placemarkIndex+1);
-            [...placemark.getElementsByTagName('Polygon')].forEach((geometry,index) => {
-              const coordinatesNode = geometry.getElementsByTagName('coordinates')[0];
-              const coordinates = parseCoordinates(coordinatesNode);
-              if (coordinates.length >= 3) features.push({type:'Polygon',name:index?featureName+' '+(index+1):featureName,coordinates:coordinates});
-            });
-            [...placemark.getElementsByTagName('LineString')].forEach((geometry,index) => {
-              const coordinatesNode = geometry.getElementsByTagName('coordinates')[0];
-              const coordinates = parseCoordinates(coordinatesNode);
-              if (coordinates.length >= 2) features.push({type:'LineString',name:index?featureName+' '+(index+1):featureName,coordinates:coordinates});
-            });
-            [...placemark.getElementsByTagName('Point')].forEach((geometry,index) => {
-              const coordinatesNode = geometry.getElementsByTagName('coordinates')[0];
-              const coordinates = parseCoordinates(coordinatesNode);
-              if (coordinates.length) features.push({type:'Point',name:index?featureName+' '+(index+1):featureName,coordinates:[coordinates[0]]});
-            });
-          });
+          const {features, rejeitadas} = kmlFeaturesFromDocument(xml);
+          if (rejeitadas.length) {
+            state.pendingMapImport = null;
+            mapImportSummary.value = file.name+' · importação bloqueada: '+rejeitadas.join('; ')+'.';
+            return;
+          }
           if (!features.length) throw new Error('nenhuma geometria compatível encontrada');
+          const count = type => features.filter(feature => feature.type === type).length;
           state.pendingMapImport = {fileName:file.name,fileSize:file.size,documentName:(xml.getElementsByTagName('Document')[0] && xml.getElementsByTagName('Document')[0].getElementsByTagName('name')[0] && xml.getElementsByTagName('Document')[0].getElementsByTagName('name')[0].textContent.trim()) || file.name,features:features,placemarkCount:placemarks};
-          mapImportSummary.value = file.name+' · '+placemarks+' Placemark · '+polygons+' polígonos · '+lines+' linhas · '+points+' pontos · '+folders+' pastas · leitura KML concluída.';
+          mapImportSummary.value = file.name+' · '+placemarks+' Placemark · '+count('Polygon')+' polígonos · '+count('LineString')+' linhas · '+count('Point')+' pontos · '+folders+' pastas · leitura KML concluída.';
         } catch (error) {
           state.pendingMapImport = null;
           mapImportSummary.value = file.name+' · falha na leitura: '+error.message+'. Corrija o arquivo antes de importar.';
@@ -2147,8 +2209,17 @@ document.getElementById('recordForm').addEventListener('submit', e => {
     const pending = state.pendingMapImport;
     const duplicateStrategy = String(formData.get('duplicate_strategy') || 'Criar nova versão');
     const existingIndex = state.importedMaps.findIndex(item => item.fileName === pending.fileName);
-    if (existingIndex >= 0 && duplicateStrategy.includes('Ignorar')) {
+    const decision = duplicateDecision(duplicateStrategy, existingIndex >= 0);
+    if (decision === 'skip') {
       showToast('Mapa já existente','O arquivo '+pending.fileName+' já foi importado e a regra escolhida mantém a versão atual.');
+      return;
+    }
+    if (decision === 'ask') {
+      showToast('Mapa já existente','O arquivo '+pending.fileName+' já foi importado. Escolha em Duplicidades: atualizar, criar nova versão ou ignorar.');
+      return;
+    }
+    if (decision === 'add' && state.importedMaps.length >= 20) {
+      showToast('Limite de 20 mapas','Exclua um mapa importado antes de adicionar outro.');
       return;
     }
     const importedRecord = {
@@ -2165,7 +2236,7 @@ document.getElementById('recordForm').addEventListener('submit', e => {
       features:pending.features,
       importedAt:new Date().toISOString()
     };
-    const retainedMaps = existingIndex >= 0 && duplicateStrategy.includes('Atualizar')
+    const retainedMaps = decision === 'replace'
       ? state.importedMaps.filter((_, index) => index !== existingIndex)
       : state.importedMaps;
     const nextMaps = [importedRecord, ...retainedMaps].slice(0,20);
