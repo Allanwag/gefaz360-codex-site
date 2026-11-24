@@ -1345,20 +1345,28 @@ function safeMapAttr(value) {
   return safeMapText(value).replace(/"/g,'&quot;');
 }
 
+// Projeção em metros: a longitude encolhe com cos(latitude), a escala é a mesma nos dois eixos
+// e o desenho fica centrado na área. Intervalo nulo (ponto único) vira 0,0001° ao redor do ponto.
+function mapProjection(coords, largura = 1000, altura = 600, margem = 50) {
+  const lons = coords.map(ponto => Number(ponto[0])), lats = coords.map(ponto => Number(ponto[1]));
+  let minLon = Math.min(...lons), maxLon = Math.max(...lons), minLat = Math.min(...lats), maxLat = Math.max(...lats);
+  if (maxLon === minLon) { minLon -= .00005; maxLon += .00005; }
+  if (maxLat === minLat) { minLat -= .00005; maxLat += .00005; }
+  const kx = Math.cos((minLat + maxLat) / 2 * Math.PI / 180);
+  const larguraGraus = (maxLon - minLon) * kx, alturaGraus = maxLat - minLat;
+  const escala = Math.min((largura - 2 * margem) / larguraGraus, (altura - 2 * margem) / alturaGraus);
+  const dx = (largura - larguraGraus * escala) / 2, dy = (altura - alturaGraus * escala) / 2;
+  return ponto => [dx + (Number(ponto[0]) - minLon) * kx * escala, dy + (maxLat - Number(ponto[1])) * escala];
+}
+
 function importedMapOverlay() {
   const mapRecords = state.importedMaps.filter(item => Array.isArray(item.features) && item.features.length);
-  const features = mapRecords.flatMap(item => item.features.map(feature => ({...feature,mapName:item.name,fileName:item.fileName})));
-  const coordinates = features.flatMap(feature => feature.coordinates || []);
+  if (!mapRecords.length) return '';
+  const latest = mapRecords[0]; // só o mais recente: mapas distantes entre si encolheriam uns aos outros
+  const features = latest.features.map(feature => ({...feature,mapName:latest.name,fileName:latest.fileName}));
+  const coordinates = features.flatMap(feature => feature.coordinates || []).filter(point => point.every(Number.isFinite));
   if (!coordinates.length) return '';
-  const longitudes = coordinates.map(point => Number(point[0])).filter(Number.isFinite);
-  const latitudes = coordinates.map(point => Number(point[1])).filter(Number.isFinite);
-  if (!longitudes.length || !latitudes.length) return '';
-  const minLon = longitudes.reduce((min,value) => Math.min(min,value), Infinity);
-  const maxLon = longitudes.reduce((max,value) => Math.max(max,value), -Infinity);
-  const minLat = latitudes.reduce((min,value) => Math.min(min,value), Infinity);
-  const maxLat = latitudes.reduce((max,value) => Math.max(max,value), -Infinity);
-  const lonRange = maxLon - minLon || .0001, latRange = maxLat - minLat || .0001;
-  const project = point => [50 + (Number(point[0]) - minLon) * 900 / lonRange, 550 - (Number(point[1]) - minLat) * 500 / latRange];
+  const project = mapProjection(coordinates);
   const colors = ['#166534','#2563eb','#b45309','#7c3aed','#be123c'];
   const shapes = features.map((feature,index) => {
     const projected = (feature.coordinates || []).map(project).filter(point => point.every(Number.isFinite));
@@ -1371,8 +1379,7 @@ function importedMapOverlay() {
     if (feature.type === 'LineString') return `<g><polyline points='${points}' fill='none' stroke='${color}' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/><text x='${center[0].toFixed(1)}' y='${center[1].toFixed(1)}'>${label}</text></g>`;
     return `<g><polygon points='${points}' fill='${color}' fill-opacity='.38' stroke='${color}' stroke-width='6' stroke-linejoin='round'/><text x='${center[0].toFixed(1)}' y='${center[1].toFixed(1)}'>${label}</text></g>`;
   }).join('');
-  const latest = mapRecords[0];
-  return `<svg class=imported-map-layer viewBox='0 0 1000 600' preserveAspectRatio=none role=img aria-label='Mapa KML importado'>${shapes}</svg><div class=imported-map-badge><strong>${safeMapText(latest.fileName || latest.name)}</strong><small>${features.length} feição${features.length===1?'':'ões'} importada${features.length===1?'':'s'} · persistido neste navegador</small></div>`;
+  return `<svg class=imported-map-layer viewBox='0 0 1000 600' preserveAspectRatio='xMidYMid meet' role=img aria-label='Mapa KML importado'>${shapes}</svg><div class=imported-map-badge><strong>${safeMapText(latest.fileName || latest.name)}</strong><small>${features.length} feição${features.length===1?'':'ões'} importada${features.length===1?'':'s'} · mapa mais recente${mapRecords.length > 1 ? ' de '+mapRecords.length : ''} · persistido neste navegador</small></div>`;
 }
 
 function mapImportPanel() {
