@@ -1441,6 +1441,9 @@ const renderers = {
   roadmap: renderRoadmap
 };
 
+// Só chaves próprias contam: "#__proto__" ou "#constructor" não são vistas.
+function isView(name) { return Object.prototype.hasOwnProperty.call(renderers, name); }
+
 const agronomicSeasonOptions = seasonOptions.map(season => '<option>'+season+'</option>').join('');
 const agronomicPlotOptions = '<option>C-07 · Boa Esperança</option><option>C-04 · Lavoura Sede</option><option>C-12 · Pedra Branca</option><option>C-02 · Vargem</option><option>M-03 · Chapadão</option><option>S-08 · Cerrado</option>';
 const soilFormMeta = '<div class=form-section><div class=form-section-head><strong>Identificação e origem</strong><span>Dados do laudo histórico</span></div><div class=form-grid><div class=form-field><label>Código da análise</label><input name=analysis_code value=SOL-053 required></div><div class=form-field><label>Ano de safra original</label><select name=season required>'+agronomicSeasonOptions+'</select></div><div class=form-field><label>Fazenda</label><select name=farm required><option>Fazenda Santa Helena</option><option>Fazenda Horizonte</option></select></div><div class=form-field><label>Talhão</label><select name=plot required>'+agronomicPlotOptions+'</select></div><div class=form-field><label>Data da coleta</label><input name=sampled_at type=date value=2025-05-18 required></div><div class=form-field><label>Profundidade</label><select name=depth><option>0–20 cm</option><option>20–40 cm</option><option>40–60 cm</option></select></div><div class=form-field><label>Laboratório</label><input name=laboratory value=LabSolo required></div><div class=form-field><label>Número do laudo</label><input name=report_number value=LS-2025-8841></div><div class=form-field><label>Método de fósforo</label><select name=phosphorus_method><option>Mehlich-1</option><option>Resina</option><option>Mehlich-3</option></select></div><div class=form-field><label>Arquivo ou referência</label><input name=report_file_ref placeholder=PDF-ou-código-do-arquivo></div></div></div>';
@@ -1653,7 +1656,7 @@ function rerenderView(renderer) {
 
 function render() {
   if (caldaEmbed && state.view !== 'spray') { caldaEmbed.destruir(); caldaEmbed = null; } // iframe do Gefaz Calda não sobrevive à troca de vista
-  const renderer = renderers[state.view] || renderDashboard;
+  const renderer = isView(state.view) ? renderers[state.view] : renderDashboard;
   renderer();
   decorateView();
   seasonSelect.value = state.season;
@@ -1671,7 +1674,7 @@ function render() {
 }
 
 function navigate(view) {
-  if (!renderers[view]) return;
+  if (!isView(view)) return;
   state.view = view;
   if (location.hash !== `#${view}`) history.pushState(null, '', `#${view}`);
   render();
@@ -2183,11 +2186,11 @@ document.getElementById('recordForm').addEventListener('submit', e => {
 
 hydrateIcons();
 const initialView = location.hash.replace('#','');
-state.view = renderers[initialView] ? initialView : 'dashboard';
-if (!renderers[initialView]) history.replaceState(null,'','#dashboard');
+state.view = isView(initialView) ? initialView : 'dashboard';
+if (!isView(initialView)) history.replaceState(null,'','#dashboard');
 window.addEventListener('hashchange', () => {
   const requestedView = location.hash.replace('#','');
-  const nextView = renderers[requestedView] ? requestedView : 'dashboard';
+  const nextView = isView(requestedView) ? requestedView : 'dashboard';
   if (requestedView !== nextView) history.replaceState(null,'',`#${nextView}`);
   if (state.view === nextView) return;
   state.view = nextView;

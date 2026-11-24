@@ -14,3 +14,14 @@ test('todas as vistas desenham sem erro', () => {
     assert.ok(a.ver(v).length > 500, v);
   }
 });
+
+test('hash que não é vista cai no painel', () => {
+  for (const h of ['#__proto__', '#constructor', '#toString', '#hasOwnProperty', '#naoexiste']) {
+    const a = carregar({ hash: h });
+    assert.equal(a.run('state.view'), 'dashboard', h);
+    assert.match(a.html(), /Bom dia, Mariana/, h);
+  }
+  const a = carregar();
+  a.run("navigate('__proto__')");
+  assert.equal(a.run('state.view'), 'dashboard');
+});
